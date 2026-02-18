@@ -1,0 +1,534 @@
+---
+title: "Data Structures and Algorithms Lab 2"
+author: "Jackson M Luckey"
+date: "2026-02-19"
+embed-resources: true
+---
+
+# Opening Exercise: "FizzBuzz"
+
+There's a [infamous programming skills screening question called "FizzBuzz"](https://blog.codinghorror.com/why-cant-programmers-program/):
+
+> Write a program that prints the numbers from 1 to 100. But for multiples of three print “Fizz” instead of the number and for the multiples of five print “Buzz.” For numbers which are multiples of both three and five print “FizzBuzz.”
+
+Try writing your own solution to "FizzBuzz". Once you get it, see if you can think of another way to solve it with fewer operations (e.g. comparisons).
+
+## Solutions
+
+::: {.callout-tip title="FizzBuzz Solutions" collapse="true"}
+
+``` python
+for ii in range(100):
+    ii += 1
+    if (ii % 3 == 0) and (ii % 5 == 0):
+        print("FizzBuzz")
+    elif (ii % 3 == 0):
+        print("Fizz")
+    elif (ii % 5 == 0):
+        print("Buzz")
+    else:
+        print(ii)
+```
+
+``` python
+for ii in range(100):
+    ii += 1
+    to_print = ''
+    if (ii % 3 != 0) and (ii % 5 != 0):
+        to_print += str(ii)
+    if ii % 3 == 0:
+        to_print += 'Fizz'
+    if ii % 5 == 0:
+        to_print += 'Buzz'
+    print(to_print)
+```
+
+``` python
+for ii in range(1, 101):
+    to_print = ''
+    if ii % 3 == 0:
+        to_print += 'Fizz'
+    if ii % 5 == 0:
+        to_print += 'Buzz'
+    if to_print == '':
+        to_print = ii
+    print(to_print)
+```
+
+``` python
+for ii in range(1, 101):
+    to_print = ''
+    if ii % 3 == 0:
+        to_print += 'Fizz'
+    if ii % 5 == 0:
+        to_print += 'Buzz'
+    print(to_print or ii)
+```
+
+``` python
+for ii in range(1, 101):
+    print("Fizz" * (ii % 3 == 0) + "Buzz" * (ii % 5 == 0) or str(ii))
+```
+
+Note: The final two solutions takes advantage of Python treating an empty string (`""`) as `False`.
+
+:::
+
+# Strings
+
+Strings (i.e. text) can be created with single (`'...'`) or double (`"..."`) quotes.
+
+```{python}
+#| repl-mode: True
+'Hello World'
+"Hello World"
+```
+
+The [`print()`](https://docs.python.org/3/library/functions.html#print) function omits the enclosing quotes, prints escaped and special characters, and defaults to automatically adding a newline (`\n`) at the end.
+
+```{python}
+#| repl-mode: True
+print('Hello World')
+print("Hello World")
+```
+
+You can include quotation marks inside your string by escaping with `\` or by using the other type of quotation mark.
+
+```{python}
+#| repl-mode: True
+"I said \"Hello World\""
+print("I said \"Hello World\"")
+print('I said "Hello World"')
+```
+
+If you don’t want characters prefaced by `\` to be interpreted as special characters, you can use raw strings by adding an `r` before the first quote.
+
+```{python}
+#| repl-mode: True
+example_windows_path = r'C:\outer_folder\inner_folder\a_file'
+example_windows_path
+print("Windows uses paths like " + example_windows_path)
+```
+
+You can concatenate strings with `+`, including variables that are strings.
+
+```{python}
+#| repl-mode: True
+"Hello" + " " + "World"
+name = "Jackson"
+"Hello " + name
+print("I said " + "\"Hello " + name + "\".")
+```
+
+This will not work with numbers. 
+
+```{python}
+#| repl-mode: True
+year = 2026
+```
+
+```{python}
+#| repl-mode: True
+#| eval: False
+"The year is " + year
+```
+
+You have to explicitly **cast** (i.e. convert) the numbers to a string with the `str()` function.
+
+```{python}
+#| repl-mode: True
+"The year is " + str(year)
+```
+
+You can also include variables using [formatted strings, also known as f-strings](https://docs.python.org/3/reference/lexical_analysis.html#f-strings). Formatted strings begin with `f` and can include variables inside curly braces (`{...}`).
+
+```{python}
+#| repl-mode: True
+print(f'I said "Hello {name}".')
+```
+
+You do not need to explicitly cast numbers to strings in f-strings.
+
+```{python}
+#| repl-mode: True
+print(f'The year is {year}')
+```
+
+You can repeat strings with `*`.
+
+```{python}
+#| repl-mode: True
+"Hello " * 5
+```
+
+You can create multi-line strings by using triple quotation marks (`'''...'''` or `"""..."""` ). End-of-line characters (`\n`, or new line) are automatically included in the string after each new line, but you can prevent this by adding a `\` at the end of a line.
+
+```{python}
+#| repl-mode: True
+claude_poem_1 = """
+R crunches numbers,
+Python builds the world around,
+Both languages shine.
+"""
+print(claude_poem_1)
+
+claude_poem_2 = """\
+R plots with beauty,
+Python scripts the pipeline,
+Data flows between.
+"""
+print(claude_poem_2)
+```
+
+(Silly course-themed haikus courtesy of Claude 4.5 Haiku)
+
+Strings can be indexed (i.e. subscripted) using brackets (`[$INDEX]`).
+
+```{python}
+#| repl-mode: True
+uni = "Hertie School"
+uni[0] # first character in string
+uni[1] # second character in string
+uni[-1] # last character in string
+```
+
+Strings can also be sliced using `[$FIRST_INDEX$:$SECOND_INDEX]`. The character corresponding to the second index is excluded. An omitted first index defaults to zero and an omitted second index defaults to the length of the string being sliced, as with lists.
+
+```{python}
+#| repl-mode: True
+uni[0:6] # characters 0-5, or the first 6 characters
+uni[7:] # characters 8+
+```
+
+You can get the length of a string with the `len()` function.
+
+```{python}
+#| repl-mode: True
+len(uni)
+```
+
+Python strings are **immutable**. In other words, they cannot be changed once created. You therefore cannot reassign an indexed position in a string.
+
+```{python}
+#| repl-mode: True
+#| eval: False
+uni[7:] = 'University'
+```
+
+Like other kinds of Python objects, strings have methods. For example, the `split()` method splits a string using a delimiter and returns a list of the substrings.
+
+```{python}
+#| repl-mode: True
+'Hello World!'.split(' ')
+'Berlin, Paris, London'.split(', ')
+```
+
+The opposite of `split()` is `join()`. `join()` is a string method that uses a string as a delimiter for combining a list of strings.
+
+```{python}
+#| repl-mode: True
+', '.join(['Berlin', 'Paris', 'London'])
+```
+
+Other common string methods include:
+
+- `upper()`: Make a string uppercase
+- `lower()`: Make a string lowercase
+- `title()`: Make a string title-case
+
+```{python}
+#| repl-mode: True
+example_str = 'i Am A sEnTeNcE cOmPoSeD wItH rAnDoMlY cApItAlIzEd ChArAcTeRs'
+example_str
+example_str.upper()
+example_str.lower()
+example_str.title()
+```
+
+# (Nested) Lists
+
+Last week I introduced you to lists and list comprehensions. As a quick example/reminder:
+
+```{python}
+#| repl-mode: True
+[x for x in range(10)]
+[x ** 2 for x in range(10)]
+```
+
+I also showed you how to iterate over a list using a `for` loop.
+
+```{python}
+#| repl-mode: True
+for num in [1, 2, 3]:
+    num ** num
+```
+
+When iterating over a list, you can use `enumerate()` to get the index in addition to the element. For example:
+
+```{python}
+#| repl-mode: True
+for index, city in enumerate(['Berlin', 'Tokyo', 'Paris']):
+    print(f'{index}. {city}')
+```
+
+Lists can be nested. For example:
+
+```{python}
+#| repl-mode: True
+nested = [['a', 'b', 'c'], [1, 2, 3]]
+nested
+```
+
+In a nested list, the inner lists are items. Using a single index (`[]`) accesses these items/lists.
+
+```{python}
+#| repl-mode: True
+nested[0]
+nested[1]
+```
+
+You can access items inside the inner lists using with multiple indexes chained together.
+
+```{python}
+#| repl-mode: True
+nested[0]
+nested[1]
+nested[0][0]
+nested[1][0]
+```
+
+As another example, we'll split Claude's poem into lines and then words using a list comprehension.
+
+```{python}
+#| repl-mode: True
+claude_poem_2.split("\n")
+
+[line.split() for line in claude_poem_2.split("\n")]
+
+poem = [line.split() for line in claude_poem_2.split("\n")]
+
+poem[0]
+poem[0][0]
+poem[0][1]
+poem[0][2:]
+poem[1]
+poem[1][0]
+poem[1][1]
+poem[1][:2]
+```
+
+# Dictionaries
+
+Dictionaries are a container for items where you choose the index. The indexes can be many different data types, including strings, numbers, and tuples. Indexes must be **hashable**, which for now you can use as a proxy for **immutable**. The indexes are called **keys**, the items are called **values**, and a key and its value are called **key-value pairs**. Like lists, dictionaries are mutable.
+
+Dictionaries are created inside curly brackets (`{}`) using `key: value` with each key-value pair separated by a comma.
+
+```{python}
+#| repl-mode: True
+berlin = {
+    "City": "Berlin",
+    "Country": "Germany",
+    "Population": 3685265,  # from Wikipedia
+    "In EU": True,
+}
+
+berlin
+berlin["City"]
+berlin["Population"]
+
+print(
+    f"{berlin['City']} is a city in {berlin['Country']} with {berlin['Population']} inhabitants"
+)
+if berlin["In EU"]:
+    print(f"{berlin['City']} is in the European Union")
+```
+
+Dictionaries have three methods that return keys, values, and key-value pairs:
+
+- `.keys()`: Returns the dictionary's keys
+- `.values()`: Returns the dictionary's values
+- `.items()`: Returns the dictionary's key-value pairs as tuples `(key, value)`
+
+You can use these methods to iterate over a dictionary.
+
+```{python}
+#| repl-mode: True
+berlin.keys()
+for key in berlin.keys():
+    key
+
+berlin.values()
+for value in berlin.values():
+    value
+
+berlin.items()
+for key, value in berlin.items():
+    print(f'{key}: {value}')
+```
+
+Dictionaries can contain lists and you can have a list of dictionaries.
+
+We'll talk more about dictionaries tomorrow.
+
+# Exercises
+
+```{python}
+#| repl-mode: True
+csv = """\
+Name, Age, Profession
+Alice, 30, Engineer
+Bob, 25, Accountant
+Charlie, 50, Teacher
+David, 22, Student
+Eve, 43, Engineer\
+"""
+```
+
+## Exercise 1
+
+Print the column names in the first line of `csv`.
+
+::: {.callout-tip title="Solution" collapse="true"}
+```{python}
+#| repl-mode: True
+print(csv.split("\n")[0])
+```
+:::
+
+## Exercise 2
+
+Print the first row of data.
+
+::: {.callout-tip title="Solution" collapse="true"}
+```{python}
+#| repl-mode: True
+print(csv.split("\n")[1])
+```
+:::
+
+## Exercise 3
+
+Print the first column name.
+
+::: {.callout-tip title="Solution" collapse="true"}
+```{python}
+#| repl-mode: True
+print(csv.split("\n")[0].split(", ")[0])
+```
+:::
+
+## Exercise 4
+
+Print the first value in the `Name` column.
+
+::: {.callout-tip title="Solution" collapse="true"}
+```{python}
+#| repl-mode: True
+print(csv.split("\n")[1].split(", ")[0])
+```
+:::
+
+## Exercise 5
+
+Print the column names along with their indices (counting from zero). For example:
+
+```
+0 = Name
+1 = Age
+2 = Profession
+```
+
+Hint: You can use `enumerate()` or get the length of a list using `len()`.
+
+::: {.callout-tip title="Solution" collapse="true"}
+```{python}
+#| repl-mode: True
+colnames = csv.split("\n")[0].split(", ")
+
+for ii in range(len(colnames)):
+    print(f"{ii} = {colnames[ii]}")
+
+for ii, colname in enumerate(colnames):
+    print(f"{ii} = {colname}")
+```
+:::
+
+### Exercise 6
+
+Taking the first row of data ("Alice, 30, Engineer"), print "`Name` is a `Age` year old `Profession`."
+
+::: {.callout-tip title="Solution" collapse="true"}
+```{python}
+#| repl-mode: True
+row1 = csv.split("\n")[1].split(", ")
+print(f"{row1[0]} is a {row1[1]} year old {row1[2]}.")
+```
+:::
+
+## Exercise 7
+
+Repeat exercise 6 but for all rows of the data.
+
+::: {.callout-tip title="Solution" collapse="true"}
+```{python}
+#| repl-mode:  True
+for row in [line.split(", ") for line in csv.split("\n")[1:]]:
+    print(f"{row[0]} is a {row[1]} year old {row[2]}.")
+```
+:::
+
+## Exercise 8
+
+Create a list with all the values of `Name` called `names`.
+
+::: {.callout-tip title="Solution" collapse="true"}
+```{python}
+#| repl-mode: True
+names = []
+for row in [line.split(", ") for line in csv.split("\n")[1:]]:
+    names.append(row[0])
+names
+```
+:::
+
+## Exercise 9
+
+Create a list of dictionaries from `csv` called `people_rows` where each row becomes a dictionary with the keys `Name`, `Age`, and `Profession`.
+
+::: {.callout-tip title="Solution" collapse="true"}
+```{python}
+#| repl-mode: True
+people_rows = []
+
+for row in [line.split(", ") for line in csv.split("\n")[1:]]:
+    people_rows.append({
+        'Name': row[0],
+        'Age': row[1],
+        'Profession': row[2]
+    })
+
+people_rows
+```
+:::
+
+## Exercise 10
+
+Create a dictionary called `people_cols` with the keys `Name`, `Age`, and `Profession` where each value is a list of the values of that column in each row in `csv`.
+
+::: {.callout-tip title="Solution" collapse="true"}
+```{python}
+#| repl-mode: True
+people_cols = {
+    'Name': [],
+    'Age': [],
+    'Profession': []
+}
+
+for row in [line.split(", ") for line in csv.split("\n")[1:]]:
+    people_cols['Name'].append(row[0])
+    people_cols['Age'].append(row[1])
+    people_cols['Profession'].append(row[2])
+
+people_cols
+```
+:::
