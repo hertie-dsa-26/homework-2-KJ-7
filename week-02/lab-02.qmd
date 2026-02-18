@@ -16,7 +16,6 @@ Try writing your own solution to "FizzBuzz". Once you get it, see if you can thi
 ## Solutions
 
 ::: {.callout-tip title="FizzBuzz Solutions" collapse="true"}
-
 ``` python
 for ii in range(100):
     ii += 1
@@ -71,7 +70,6 @@ for ii in range(1, 101):
 ```
 
 Note: The final two solutions takes advantage of Python treating an empty string (`""`) as `False`.
-
 :::
 
 # Strings
