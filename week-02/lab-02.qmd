@@ -16,7 +16,7 @@ Try writing your own solution to "FizzBuzz". Once you get it, see if you can thi
 ## Solutions
 
 ::: {.callout-tip title="FizzBuzz Solutions" collapse="true"}
-``` python
+```{python}
 for ii in range(100):
     ii += 1
     if (ii % 3 == 0) and (ii % 5 == 0):
@@ -530,3 +530,15 @@ for row in [line.split(", ") for line in csv.split("\n")[1:]]:
 people_cols
 ```
 :::
+
+## Exercise 11
+
+Using `people_rows` and `people_cols`:
+
+1. Find the mean `Age`
+2. Find the min, median, and max `Age`
+3. Order the values of `Name` by the associated `Age`.
+4. Print the `Name` of all people whose `Profession` is `"Engineer"`.
+5. Count the number of occurences of each value of `Profession` and return it as a key with `Profession` values as keys and the count as values.
+
+For each task, is it easier to use `people_rows` or `people_cols`? Why? Can you figure out how to perform the task with the other?
