@@ -2,11 +2,9 @@
 title: Lab 3
 ---
 
-## Data Structures & Algorithms
-### Week 3 2025
+# Overview
 
-
-# Today
+## Today
 
 * [What is flask?](#flask)
 * [Web development resources](#resources)
@@ -44,6 +42,14 @@ You might wonder why we're learning the **web framework Flask** in a data struct
 - Data Flow: Web apps provide an opportunity to demonstrate key CS concepts, such as request/response cycles, state management, and the client-server model.
 
 - Final Project Foundation: Your course project will involve deploying an algorithm as a web service. This lab (and Flask in general) provides a foundation.
+
+## Additional Resources <a class="anchor" id="resources"></a>
+
+- [Flask Quickstart](https://flask.palletsprojects.com/en/3.1.x/quickstart/)
+- [Jinja2 Templates](https://jinja.palletsprojects.com/en/stable/templates/)
+- [HTML Cheatsheet](https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Cheatsheet)
+- [CSS Quickstart](https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Styling_the_content)
+- [CSS Overview and Tutorials](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics)
 
 # What is flask and why should we use it? <a class="anchor" id="flask"></a>
 
@@ -109,7 +115,7 @@ A **template** is an HTML file with special syntax that Flask processes and fill
 
 ### Flask and the MVC Pattern
 
-Most web frameworks are loosely organised around the **Model-View-Controller (MVC)** pattern. MVC divides a program into three layers of responsibility so that changes in one area do not ripple through the others.
+Most web frameworks are loosely organised around the **Model-View-Controller (MVC)** pattern. MVC divides a program into three layers of responsibility so that (ideally) changes in one do not (directly) affect the others.
 
 | Layer | Responsibility | In Flask |
 |---|---|---|
@@ -117,31 +123,31 @@ Most web frameworks are loosely organised around the **Model-View-Controller (MV
 | **View** | What the user sees | Jinja2 templates (`.html` files in `templates/`) |
 | **Controller** | Receives requests, coordinates Model and View | Flask routes and view functions |
 
-Flask does not enforce MVC — it imposes no required folder structure and no base classes. But the pattern maps naturally onto every Flask app:
+Flask does not enforce/require MVC but the pattern maps naturally onto every Flask app:
 
 1. A browser sends a request to a URL.
 2. Flask's router (the **Controller**) matches the URL and calls the right view function.
-3. The view function runs whatever Python logic it needs (the **Model**) — perhaps sorting a list, querying a database, or computing a Fibonacci number.
+3. The view function runs whatever Python logic it needs (the **Model**), such as sorting a list, querying a database, or computing a Fibonacci number.
 4. It passes the result to a Jinja2 template (the **View**), which renders it as HTML.
 5. Flask sends the HTML back to the browser.
 
 Keeping these three layers separate pays off as your apps grow in size and complexity. Business logic stays in Python files, the presentation layer stays in templates, and neither layer needs to know about the other's implementation details. This makes future changes easier.
 
-# Resources <a class="anchor" id="resources"></a>
-
-- [Flask Quickstart](https://flask.palletsprojects.com/en/3.1.x/quickstart/) example is a great place to start building flask apps
-- [Jinja2 Templates](https://jinja.palletsprojects.com/en/stable/templates/)
-- [HTML Cheatsheet](https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Cheatsheet)
-- [CSS Quickstart](https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Styling_the_content)
-- [CSS Overview and Tutorials](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics)
-
 # Create your first flask app <a class="anchor" id="first"></a>
 
-## 1. Install Flask with `uv` <a class="anchor" id="install"></a>
+## 1. Create a `uv` project and install Flask <a class="anchor" id="install"></a>
 
-This course uses `uv` for package management (the same tool you used in weeks 1 and 2). A `pyproject.toml` for this week is already included in the `week-03/` directory — you just need to add Flask to it and install.
+This course uses `uv` for package management Wherever the Flask documentation or other tutorials say `flask run`, prefix it with `uv run` so that Flask runs inside the `uv` managed environment. We'll start by creating a dedicated directory for your Flask app and initialising a new `uv` project inside it. From inside the `week-03/` directory, run:
 
-From inside the `week-03/` directory, run:
+```bash
+mkdir my_flask_app
+cd my_flask_app
+uv init
+```
+
+`uv init` creates a `pyproject.toml` and a `hello.py` starter file. You can delete `hello.py` — you will create `flaskapp.py` in the next step.
+
+Now add Flask as a dependency:
 
 ```bash
 uv add flask
@@ -150,55 +156,31 @@ uv add flask
 This single command:
 
 1. Resolves the Flask package and its dependencies
-2. Adds `flask` to your `pyproject.toml` under `[project] dependencies`
+2. Adds `flask` to `pyproject.toml` under `[project] dependencies`
 3. Creates (or updates) a `uv.lock` file pinning exact versions
-4. Installs everything into a local `.venv` — no manual activation needed
-
-You do not need to create a separate environment or run `pip install`. `uv` manages everything for you.
-
-> Note: Wherever the Flask documentation or other tutorials say `flask run`, you will prefix that command with `uv run` so that Flask is executed inside the managed environment:
-> ```bash
-> uv run flask --app flaskapp run
-> ```
+4. Installs everything into a local `.venv` (no manual activation required)
 
 ## 2. Set-up your Flask app <a class="anchor" id="setup"></a>
 
-* Create a new directory for the web app project:
-    ```bash
-    mkdir my_flask_app
-    cd my_flask_app
-    ```
+Create a new Python file called `flaskapp.py` inside `my_flask_app/` containing:
 
-* Create a new Python file called `flaskapp.py` inside the project directory and copy in this code:
+```{.python filename="flaskapp.py"}
+from flask import Flask   # <1>
 
-    ```python
-    from flask import Flask   # (1) import the Flask class
+app = Flask(__name__)     # <2>
 
-    app = Flask(__name__)     # (2) create an instance of that class
+@app.route("/")           # <3>
+def home():               # <4>
+    return "Home Page"    # <5>
+```
 
-    @app.route("/")           # (3) register a route
-    def home():               # (4) define the view function
-        return "Home Page"    # (5) return the response body
-    ```
+1. Imports the `Flask` class from the `flask` package. Everything in a Flask app flows through an instance of this class.
+2. Creates your application object. The `__name__` argument tells Flask where this module lives so it can find resources like templates and static files *relative to this file*. When you run `flaskapp.py` directly, `__name__` equals `"__main__"`; when it is imported, `__name__` is `"flaskapp"`. Either way, Flask resolves file paths correctly.
+3. This is a **decorator** — a Python feature that wraps one function with another. Here, `app.route("/")` registers the decorated function in Flask's routing table: "when someone visits `/`, call `home()`." Decorators always appear directly above the function they modify, prefixed with `@`.
+4. The **view function**. Flask calls this whenever the route is matched.
+5. The return value becomes the HTTP response body. You can return plain text, HTML strings, or (later) rendered templates.
 
-* Save the file. Do not name it `flask.py` — that would shadow the Flask package itself and cause an import error.
-
-### What does each line actually do?
-
-(1) `from flask import Flask`
-Imports the `Flask` class from the `flask` package. Everything in a Flask app flows through an instance of this class.
-
-(2) `app = Flask(__name__)`
-Creates your application object. The `__name__` argument tells Flask where this module lives so it can find resources like templates and static files *relative to this file*. When you run `flaskapp.py` directly, `__name__` equals `"__main__"`; when it is imported, `__name__` is `"flaskapp"`. Either way, Flask resolves file paths correctly.
-
-(3) `@app.route("/")`
-This is a **decorator** — a Python feature that wraps one function with another. Here, `app.route("/")` registers the decorated function in Flask's routing table: "when someone visits `/`, call `home()`." Decorators always appear directly above the function they modify, prefixed with `@`.
-
-(4) `def home():`
-The **view function**. Flask calls this whenever the route is matched.
-
-(5) `return "Home Page"`
-The return value becomes the HTTP response body. You can return plain text, HTML strings, or (later) rendered templates.
+Note: Do not name it `flask.py`, as that would overlap with the Flask package itself and cause an import error.
 
 ## 3. Run your Flask app <a class="anchor" id="run"></a>
 
@@ -210,7 +192,7 @@ uv run flask --app flaskapp run
 
 If everything is working, your terminal will print something like:
 
-```
+```bash
  * Serving Flask app 'flaskapp'
  * Debug mode: off
 WARNING: This is a development server. Do not use it in a production deployment.
@@ -218,7 +200,7 @@ WARNING: This is a development server. Do not use it in a production deployment.
 Press CTRL+C to quit
 ```
 
-Copy `http://127.0.0.1:5000` into your browser. You should see "Home Page".
+Copy the URL `http://127.0.0.1:5000` into your browser. You should see "Home Page".
 
 ### What is `127.0.0.1:5000`?
 
@@ -227,21 +209,23 @@ Think of a network address like a building's postal address:
 - `127.0.0.1` is the IP address — it means *this computer* (also called the **loopback address** or **localhost**). Traffic sent here never leaves your machine; it loops straight back to your own network stack. You can also type `localhost` instead.
 - `5000` is the **port** — think of it as the apartment number within the building. Many programs can run on the same machine simultaneously, each listening on a different port. Flask defaults to 5000; if that port is taken, use `--port 5001`.
 
-> If you see `OSError: [Errno 48] Address already in use`, another process is already on port 5000. Run with a different port:
-> ```bash
-> uv run flask --app flaskapp run --port 5001
-> ```
+If you see `OSError: [Errno 48] Address already in use`, another process is already on port 5000. Run with a different port:
+
+```bash
+uv run flask --app flaskapp run --port 5001
+```
 
 ### What does "Running on http://127.0.0.1:5000" mean under the hood?
 
 Flask starts a WSGI development server (Werkzeug) that:
 
-1. Binds to the port and listens for incoming TCP connections
-2. Parses each HTTP request (method, URL, headers, body)
-3. Dispatches to your view functions via the routing table
-4. Serialises the return value into an HTTP response
+1. Binds to the port and listens for incoming (TCP) connections.
+2. Parses each incoming HTTP request (method, URL, headers, body).
+3. Sends incoming HTTP requests to the correct view functions using the routing table.
+4. Serialises the return value from the view function into an HTTP response.
+5. Returns the HTTP response to the requestor.
 
-To stop the server: press Ctrl+C in the terminal.
+You can stop the server by pressing press Ctrl+C in the terminal.
 
 ## 4. Make some first changes to your app <a class="anchor" id="changes"></a>
 
@@ -249,11 +233,15 @@ To stop the server: press Ctrl+C in the terminal.
 
 Replace `"Home Page"` in the `home` function with an HTML heading:
 
-```python
+```{.python filename="flaskapp.py"}
 return "<h1>Home Page</h1>"
 ```
 
-HTML **tags** like `<h1>` tell the browser how to render text. `<h1>` is the largest heading; `<p>` is a paragraph; `<b>` is bold.
+HTML **tags** like `<h1>` tell the browser how to render text. Some common tags include:
+
+- `<h1>` is the largest heading
+- `<p>` is a paragraph
+- `<b>` is bold.
 
 After saving, you need to restart the server to see the change:
 
@@ -261,14 +249,16 @@ After saving, you need to restart the server to see the change:
 2. Re-run `uv run flask --app flaskapp run`
 3. Refresh your browser
 
-This gets tedious quickly — which is why Flask has debug mode.
+This gets tedious quickly, which is why Flask has debug mode.
 
 ### Debug Mode (Auto-Reload)
 
 Debug mode does two things:
 
-1. **Hot-reload:** Flask watches your `.py` files for changes and restarts the server automatically the moment you save. You only need to refresh the browser — no manual Ctrl+C and re-run.
-2. **Interactive debugger:** If your code raises an exception, the browser shows a detailed traceback with an interactive console (instead of a generic "500 Internal Server Error").
+1. **Hot-reload:** Flask watches your `.py` files for changes and restarts the server automatically when you save one of them. You only need to refresh the browser instead of manually restarting the server.
+2. **Interactive debugger:** If your code raises an exception, the browser shows a detailed **traceback** with an interactive console (instead of a generic "500 Internal Server Error").
+
+Never run debug mode in production. The interactive debugger allows arbitrary Python code execution in the browser, so only enable it during development on your local machine.
 
 Enable debug mode by adding `--debug` to the run command:
 
@@ -278,7 +268,7 @@ uv run flask --app flaskapp run --debug
 
 Your terminal will now show:
 
-```
+```bash
  * Debug mode: on
  * Running on http://127.0.0.1:5000
  * Restarting with stat
@@ -287,7 +277,7 @@ Your terminal will now show:
 
 Alternatively, you can add these lines to the bottom of `flaskapp.py` and run the file directly with Python:
 
-```python
+```{.python filename="flaskapp.py"}
 if __name__ == '__main__':
     app.run(debug=True)
 ```
@@ -298,9 +288,7 @@ Then:
 uv run python flaskapp.py
 ```
 
-The `if __name__ == '__main__':` guard ensures that `app.run()` is only called when you run the script directly, not when Flask imports it as a module.
-
-> Security note: Never run debug mode in production. The interactive debugger allows arbitrary Python code execution in the browser — only enable it on your local machine.
+The `if __name__ == '__main__':` ensures that `app.run()` is only called when you run the script directly, not when Flask imports it as a module.
 
 ## 5. Create new pages with routing <a class="anchor" id="newpages"></a>
 
@@ -308,7 +296,7 @@ The `if __name__ == '__main__':` guard ensures that `app.run()` is only called w
 
 Add a second page by pasting this into `flaskapp.py`:
 
-```python
+```{.python filename="flaskapp.py"}
 @app.route("/hello")
 def hello():
     return "<h1>Hello, Berlin!</h1>"
@@ -329,7 +317,7 @@ Visit `http://localhost:5000/hello` to see your new page.
 1. You type `http://localhost:5000/hello` in the browser.
 2. The browser sends `GET /hello HTTP/1.1` to Flask.
 3. Flask scans its routing table for a pattern that matches `/hello`.
-4. It finds `@app.route("/hello")` → calls `hello()`.
+4. It finds `@app.route("/hello")` and calls `hello()`.
 5. `hello()` returns the HTML string.
 6. Flask wraps it in an HTTP 200 response and sends it back.
 
@@ -337,7 +325,7 @@ Visit `http://localhost:5000/hello` to see your new page.
 
 If you want both `/` and `/home` to serve the home page, stack decorators:
 
-```python
+```{.python filename="flaskapp.py"}
 @app.route("/")
 @app.route("/home")
 def home():
@@ -346,15 +334,15 @@ def home():
 
 Flask will call `home()` for either URL.
 
-> Important: Every view function name must be unique. If you define two functions both called `home`, Python will silently overwrite the first one and Flask will only register the second. Use distinct names like `home`, `about`, `hello`, etc.
+Every view function name must be unique. If you define two functions both called `home`, Python will silently overwrite the first one and Flask will only register the second. Use distinct names like `home`, `about`, `hello`, etc.
 
 ## 6. Pass variables through the URL <a class="anchor" id="variables"></a>
 
-Static routes like `/hello` always return the same page. **URL variables** let you pass data to the view function directly in the URL path, making pages dynamic.
+Static routes like `/hello` always return the same page. **URL variables** let you pass data to the view function directly in the URL path, making pages **dynamic**.
 
 Update your `hello` route in `flaskapp.py`:
 
-```python
+```{.python filename="flaskapp.py"}
 @app.route("/hello/<city>")
 def hello(city):
     return f"<h1>Hello, {city}!</h1>"
@@ -362,9 +350,9 @@ def hello(city):
 
 Now try visiting:
 
-- `http://localhost:5000/hello/Berlin` → "Hello, Berlin!"
-- `http://localhost:5000/hello/London` → "Hello, London!"
-- `http://localhost:5000/hello/NewYork` → "Hello, NewYork!"
+- `http://localhost:5000/hello/Berlin` should give "Hello, Berlin!"
+- `http://localhost:5000/hello/London` should give "Hello, London!"
+- `http://localhost:5000/hello/NewYork` should give "Hello, NewYork!"
 
 ### How it works
 
@@ -372,7 +360,7 @@ Angle brackets in the route pattern (`<city>`) are **variable segments**. Flask 
 
 ### Type converters
 
-By default, URL variables are captured as strings. Flask supports **type converters** that validate and convert the value automatically:
+By default, URL variables are captured as strings. Flask supports **type converters** that **validate** and convert the value automatically:
 
 | Converter | Example route | Captured type |
 |---|---|---|
@@ -381,28 +369,28 @@ By default, URL variables are captured as strings. Flask supports **type convert
 | `float` | `<float:x>` | `float` |
 | `path` | `<path:subpath>` | `str` including `/` characters |
 
-You will use `<int:n>` in the Fibonacci route in the preview section — it ensures the value is a valid integer before it reaches your Python function.
+You will use `<int:n>` in the Fibonacci route in the preview section. It ensures the value `n` is a valid integer before it reaches your Python function.
 
 ### URL encoding
 
 Spaces and special characters are not allowed in URLs. The browser automatically encodes them:
 
-- space → `%20`
-- `/hello/New York` → `/hello/New%20York`
+- space becomes `%20`
+- `/hello/New York` becomes `/hello/New%20York`
 
 Flask decodes `%20` back to a space before passing the value to your function, so `city` will equal `"New York"` (with a space) in Python.
 
 ## 7. Add more content using templates <a class="anchor" id="templates"></a>
 
-Embedding HTML directly in Python return statements works for trivial pages, but it scales poorly. Flask solves this with **templates**: separate HTML files that can contain dynamic placeholders.
+Embedding HTML directly in Python return statements works for trivial pages, but it scales poorly. Flask solves this with **templates**, which separate HTML files that can contain placeholders for dynamic content.
 
-The template engine Flask uses is called **Jinja2** (the same engine used by Ansible, SaltStack, and many other tools). You write HTML as normal, then sprinkle in `{{ variable }}` placeholders and `{% control flow %}` blocks wherever you need Python data.
+The template engine Flask uses is called **Jinja2** (the same engine used by many other tools). You write HTML as normal and include `{{ variable }}` placeholders and `{% control flow %}` blocks wherever you need Python data.
 
 ### Setting up the template directory
 
 Flask automatically looks for templates in a folder called `templates/` that lives in the same directory as your `flaskapp.py` file.
 
-Required directory structure:
+In other words, your directory structure should be:
 
 ```
 my_flask_app/
@@ -411,11 +399,11 @@ my_flask_app/
     └── home.html
 ```
 
-> If the `templates/` folder is in the wrong place (e.g. inside a sub-directory), Flask will raise a `TemplateNotFound` error.
+If the `templates/` folder is in the wrong place (e.g. inside a sub-directory), Flask will raise a `TemplateNotFound` error.
 
 ### Step 1: Create `templates/home.html`
 
-```html
+```{.html filename="templates/home.html"}
 <!doctype html>
 <html>
 <head>
@@ -430,7 +418,7 @@ my_flask_app/
 </html>
 ```
 
-This is a minimal valid HTML document. Every HTML file has the same outer skeleton:
+This is a minimal valid HTML document. Every HTML file has the same boilerplate:
 
 - `<!doctype html>` — tells the browser this is HTML5
 - `<head>` — metadata (title, CSS, etc.) — not visible on the page
@@ -440,7 +428,7 @@ This is a minimal valid HTML document. Every HTML file has the same outer skelet
 
 Add `render_template` to your import and update the `home` function:
 
-```python
+```{.python filename="flaskapp.py"}
 from flask import Flask, render_template   # add render_template
 
 app = Flask(__name__)
@@ -453,9 +441,9 @@ def home():
 
 `render_template('home.html')` tells Flask to:
 
-1. Find `templates/home.html` relative to your app
-2. Process any Jinja2 placeholders (none yet, but coming in step 8)
-3. Return the resulting HTML string as the response body
+1. Find `templates/home.html` relative to your app.
+2. Process any Jinja2 placeholders.
+3. Return the resulting HTML string as the response body.
 
 ## 8. Passing variables from Python to the template
 
@@ -463,7 +451,7 @@ You can pass any Python data into a template by providing keyword arguments to `
 
 ### Step 1: Update the view function
 
-```python
+```{.python filename="flaskapp.py"}
 @app.route("/home")
 def home():
     return render_template('home.html', heading='My personal home page')
@@ -475,7 +463,7 @@ The string `'My personal home page'` is now bound to the name `heading` inside t
 
 In `home.html`, replace the static `<h1>` with a Jinja2 expression:
 
-```html
+```{.html filename="templates/home.html"}
 <h1>{{ heading }}</h1>
 ```
 
@@ -495,7 +483,7 @@ Jinja2 has three tag types:
 
 Make the heading optional — if `heading` is not passed, fall back to a default:
 
-```html
+```{.html filename="templates/home.html"}
 <body>
 {% if heading %}
     <h1>{{ heading }}</h1>
@@ -506,22 +494,20 @@ Make the heading optional — if `heading` is not passed, fall back to a default
 </body>
 ```
 
-Jinja2 treats `None`, `""`, `0`, `[]`, and `{}` all as falsy — same as Python.
+Jinja2 treats `None`, `""`, `0`, `[]`, and `{}` all as falsy like Python (recall that everything in Python is truthy).
 
 ### Looping over a list
 
-You can pass any Python object — including lists and dicts — and loop over them in the template. This becomes essential when displaying algorithm results:
+You can pass Python objects, such as lists and dicts, and loop over them in the template. This is useful for displaying results:
 
-```python
-# In flaskapp.py
+```{.python filename="flaskapp.py"}
 @app.route("/home")
 def home():
     items = ["Sort results", "Search results", "Graph paths"]
     return render_template('home.html', heading='My App', items=items)
 ```
 
-```html
-<!-- In home.html -->
+```{.html filename="templates/home.html"}
 <ul>
 {% for item in items %}
     <li>{{ item }}</li>
@@ -529,14 +515,14 @@ def home():
 </ul>
 ```
 
-This renders a `<ul>` with one `<li>` per item in the list — exactly how you will display algorithm output in later exercises.
+This renders a `<ul>` with one `<li>` per item in the list, which is exactly how you will display algorithm output in later exercises.
 
 ## 9. Some very basic HTML and CSS  <a class="anchor" id="html"></a>
 
-Now let us add some very basic styling to your home page by adapting your HTML code and adding some CSS
+Now let's add some very basic styling to the home page by adapting the HTML code and adding some CSS
 
-1. wrap the text that you have placed within the `body` tag in a `div` tag and assign it a `class` called `'myDiv'`:
-    ```HTML
+1. Wrap the text that you have placed within the `body` tag in a `div` tag and assign it a `class` called `'myDiv'`:
+    ```{.html filename="templates/home.html"}
     <body>
     <div class="myDiv">
     {% if heading %}
@@ -549,8 +535,8 @@ Now let us add some very basic styling to your home page by adapting your HTML c
     </body>
     ```
 
-2. add some CSS styling into a style tag within the head tag, so that your new head tag looks like this:
-    ```HTML
+2. Add some CSS styling into a style tag within the head tag:
+    ```{.html filename="templates/home.html"}
     <head>
         <title>Home</title>
         <meta name="description" content="My home page, on which I showcase my work!">
@@ -571,9 +557,9 @@ Refresh your page and see how it has changed!
 
 ## Connecting Flask to Algorithms: A Preview
 
-Here's a taste of how Flask will connect to our algorithmic work. Add this route to your app:
+Here's a taste of how Flask will connect to actual Python code, such as an algorithm. Add this route to your app:
 
-```python
+```{.python filename="flaskapp.py"}
 @app.route("/fibonacci/<int:n>")
 def fibonacci_api(n):
     """Return the nth Fibonacci number as JSON."""
@@ -647,7 +633,7 @@ Try going to `http://localhost:5000/hello` in your browser after having complete
 
 The easiest (but not very scalable) way to do this is within your `.py` file:
 
-```python
+```{.python filename="flaskapp.py"}
 @app.route("/hello")
 @app.route("/hello/<city>")
 def hello(city=None):
@@ -659,7 +645,7 @@ def hello(city=None):
 
 Alternatively (and this would be the more elegant and scalable way to do this) is to deal with the case of the city variable not being specified (aka being `None`) in a template. In this case, your `hello` function would look like this:
 
-```python
+```{.python filename="flaskapp.py"}
 @app.route("/hello")
 @app.route("/hello/<city>")
 def hello(city=None):
@@ -668,7 +654,7 @@ def hello(city=None):
 
 You then also need to create a `hello.html` template within the `templates` folder, into which you write:
 
-```html
+```{.html filename="templates/hello.html"}
 <!doctype html>
 <html>
 <head>
@@ -695,7 +681,7 @@ Add an 'about' page to your app, which shows the text 'About Page' in an `h1` ta
 <details>
 <summary><b>Solution</b></summary>
 
-```python
+```{.python filename="flaskapp.py"}
 @app.route("/about")
 def about():
     return "<h1>About Page</h1>"
@@ -712,7 +698,7 @@ Create a new template specifically for this new 'about' page by copying and past
 
 Create `templates/about.html`:
 
-```html
+```{.html filename="templates/about.html"}
 <!doctype html>
 <html>
 <head>
@@ -729,7 +715,7 @@ Create `templates/about.html`:
 
 Update `flaskapp.py`:
 
-```python
+```{.python filename="flaskapp.py"}
 @app.route("/about")
 def about():
     return render_template('about.html')
@@ -749,7 +735,7 @@ Currently, if you want a navigation bar on every page, you'd have to copy the HT
 
 Create `templates/layout.html`:
 
-```html
+```{.html filename="templates/layout.html"}
 <!doctype html>
 <html>
 <head>
@@ -779,7 +765,7 @@ Key concepts:
 
 Modify `templates/home.html`:
 
-```html
+```{.html filename="templates/home.html"}
 {% extends "layout.html" %}
 
 {% block title %}Home - My App{% endblock %}
@@ -819,8 +805,7 @@ nav a:hover {
 <details>
 <summary><b>Full Solution</b></summary>
 
-layout.html:
-```html
+```{.html filename="templates/layout.html"}
 <!doctype html>
 <html>
 <head>
@@ -844,8 +829,7 @@ layout.html:
 </html>
 ```
 
-about.html:
-```html
+```{.html filename="templates/about.html"}
 {% extends "layout.html" %}
 
 {% block title %}About - My App{% endblock %}
