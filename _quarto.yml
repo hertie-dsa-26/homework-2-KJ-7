@@ -1,0 +1,15 @@
+toc: true
+number-sections: true
+  
+format:
+  html:
+    theme:
+      - journal
+      - custom.scss
+    html-math-method: katex
+    highlight-style: monokai
+
+filters:
+  - jacksonmluckey/repl-mode
+
+repl-highlight-style: monokai
