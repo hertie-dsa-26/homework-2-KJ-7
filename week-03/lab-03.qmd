@@ -25,13 +25,13 @@ title: Lab 3
 
 You might wonder why we're learning Flask in a DSA course. Here's the connection:
 
-1. **Practical Application**: Many algorithms you'll learn (sorting, searching, graph traversal) need interfaces. Building a simple web app lets you visualize and interact with your algorithms.
+1. Practical Application: Many algorithms you'll learn (sorting, searching, graph traversal) need interfaces. Building a simple web app lets you visualize and interact with your algorithms.
 
-2. **API Design**: Later labs will have you build REST APIs that expose algorithmic functionality. Understanding Flask routing is essential for this.
+2. API Design: Later labs will have you build REST APIs that expose algorithmic functionality. Understanding Flask routing is essential for this.
 
-3. **Data Flow**: Web apps demonstrate key CS concepts: request/response cycles, state management, and the client-server model.
+3. Data Flow: Web apps demonstrate key CS concepts: request/response cycles, state management, and the client-server model.
 
-4. **Final Project Foundation**: Your course project may involve deploying an algorithm as a web service. This lab provides that foundation.
+4. Final Project Foundation: Your course project may involve deploying an algorithm as a web service. This lab provides that foundation.
 
 ## Learning Objectives
 
@@ -43,7 +43,7 @@ By completing this lab, you will be able to:
 4. Structure a multi-page application with template inheritance
 5. *(Foundation for future labs)* Understand how to expose Python functions via HTTP endpoints
 
-**Prerequisites:** This lab uses Python classes and objects (e.g., `Flask(__name__)`). If you need a refresher on OOP, see [Lab 2](lab_2_oop_classes.ipynb).
+Prerequisites: This lab uses Python classes and objects (e.g., `Flask(__name__)`). If you need a refresher on OOP, see [Lab 2](lab_2_oop_classes.ipynb).
 
 # What is flask and why should we use it? <a class="anchor" id="flask"></a>
 
@@ -51,8 +51,8 @@ By completing this lab, you will be able to:
 
 Flask is a **microframework** for building web applications in Python.
 
-- **"Micro" means minimal by design** — Flask ships with just the essentials: routing, request handling, and templating. Unlike Django, it does not include an ORM, admin interface, or built-in authentication. You add what you need, nothing more.
-- **"Micro" does not mean underpowered.** Flask can power everything from a simple one-page site to a production API serving millions of requests.
+- "Micro" means minimal by design — Flask ships with just the essentials: routing, request handling, and templating. Unlike Django, it does not include an ORM, admin interface, or built-in authentication. You add what you need, nothing more.
+- "Micro" does not mean underpowered. Flask can power everything from a simple one-page site to a production API serving millions of requests.
 - Flask is **"Pythonic"**: it follows Python's design philosophy of readability, simplicity, and explicitness. If you understand Python, Flask will feel natural.
 
 ### Why Flask and not Django?
@@ -68,7 +68,7 @@ For this course, Flask is the right choice: we want a thin layer that exposes ou
 
 ### How Flask Works: The Request-Response Cycle
 
-Every web framework is built around one fundamental idea: a **browser sends a request, the server sends back a response**.
+Every web framework is built around one fundamental idea: a browser sends a request, the server sends back a response.
 
 ```
 Browser (client)          Flask (server)           Your Python code
@@ -82,10 +82,10 @@ Browser (client)          Flask (server)           Your Python code
 
 Flask's job is to:
 
-1. **Listen** for incoming HTTP requests on a port (default: 5000)
-2. **Match** the URL to the right Python function (routing)
-3. **Call** that function and collect its return value
-4. **Wrap** the return value in an HTTP response and send it back
+1. Listen for incoming HTTP requests on a port (default: 5000)
+2. Match the URL to the right Python function (routing)
+3. Call that function and collect its return value
+4. Wrap the return value in an HTTP response and send it back
 
 ### Key Concepts at a Glance
 
@@ -114,9 +114,9 @@ There are many good tutorials for creating flask apps, here is a selection:
 
 ## 1. Install Flask with `uv` <a class="anchor" id="install"></a>
 
-This course uses **`uv`** for package management (the same tool you used in weeks 1 and 2). A `pyproject.toml` for this week is already included in the `week-03/` directory — you just need to add Flask to it and install.
+This course uses `uv` for package management (the same tool you used in weeks 1 and 2). A `pyproject.toml` for this week is already included in the `week-03/` directory — you just need to add Flask to it and install.
 
-**From inside the `week-03/` directory**, run:
+From inside the `week-03/` directory, run:
 
 ```bash
 uv add flask
@@ -131,20 +131,20 @@ This single command:
 
 You do not need to create a separate environment or run `pip install`. `uv` manages everything for you.
 
-> **Note:** Wherever the Flask documentation or other tutorials say `flask run`, you will prefix that command with `uv run` so that Flask is executed inside the managed environment:
+> Note: Wherever the Flask documentation or other tutorials say `flask run`, you will prefix that command with `uv run` so that Flask is executed inside the managed environment:
 > ```bash
 > uv run flask --app flaskapp run
 > ```
 
 ## 2. Set-up your Flask app <a class="anchor" id="setup"></a>
 
-* **Create a new directory** for the web app project:
+* Create a new directory for the web app project:
     ```bash
     mkdir my_flask_app
     cd my_flask_app
     ```
 
-* **Create a new Python file called `flaskapp.py`** inside the project directory and copy in this code:
+* Create a new Python file called `flaskapp.py` inside the project directory and copy in this code:
 
     ```python
     from flask import Flask   # (1) import the Flask class
@@ -156,23 +156,23 @@ You do not need to create a separate environment or run `pip install`. `uv` mana
         return "Home Page"    # (5) return the response body
     ```
 
-* **Save the file.** Do not name it `flask.py` — that would shadow the Flask package itself and cause an import error.
+* Save the file. Do not name it `flask.py` — that would shadow the Flask package itself and cause an import error.
 
 ### What does each line actually do?
 
-**(1) `from flask import Flask`**
+(1) `from flask import Flask`
 Imports the `Flask` class from the `flask` package. Everything in a Flask app flows through an instance of this class.
 
-**(2) `app = Flask(__name__)`**
+(2) `app = Flask(__name__)`
 Creates your application object. The `__name__` argument tells Flask where this module lives so it can find resources like templates and static files *relative to this file*. When you run `flaskapp.py` directly, `__name__` equals `"__main__"`; when it is imported, `__name__` is `"flaskapp"`. Either way, Flask resolves file paths correctly.
 
-**(3) `@app.route("/")`**
+(3) `@app.route("/")`
 This is a **decorator** — a Python feature that wraps one function with another. Here, `app.route("/")` registers the decorated function in Flask's routing table: "when someone visits `/`, call `home()`." Decorators always appear directly above the function they modify, prefixed with `@`.
 
-**(4) `def home():`**
+(4) `def home():`
 The **view function**. Flask calls this whenever the route is matched.
 
-**(5) `return "Home Page"`**
+(5) `return "Home Page"`
 The return value becomes the HTTP response body. You can return plain text, HTML strings, or (later) rendered templates.
 
 ## 3. Run your Flask app <a class="anchor" id="run"></a>
@@ -199,8 +199,8 @@ Copy `http://127.0.0.1:5000` into your browser. You should see "Home Page".
 
 Think of a network address like a building's postal address:
 
-- **`127.0.0.1`** is the IP address — it means *this computer* (also called the **loopback address** or **localhost**). Traffic sent here never leaves your machine; it loops straight back to your own network stack. You can also type `localhost` instead.
-- **`5000`** is the **port** — think of it as the apartment number within the building. Many programs can run on the same machine simultaneously, each listening on a different port. Flask defaults to 5000; if that port is taken, use `--port 5001`.
+- `127.0.0.1` is the IP address — it means *this computer* (also called the **loopback address** or **localhost**). Traffic sent here never leaves your machine; it loops straight back to your own network stack. You can also type `localhost` instead.
+- `5000` is the **port** — think of it as the apartment number within the building. Many programs can run on the same machine simultaneously, each listening on a different port. Flask defaults to 5000; if that port is taken, use `--port 5001`.
 
 > If you see `OSError: [Errno 48] Address already in use`, another process is already on port 5000. Run with a different port:
 > ```bash
@@ -209,14 +209,14 @@ Think of a network address like a building's postal address:
 
 ### What does "Running on http://127.0.0.1:5000" mean under the hood?
 
-Flask starts a **WSGI development server** (Werkzeug) that:
+Flask starts a WSGI development server (Werkzeug) that:
 
 1. Binds to the port and listens for incoming TCP connections
 2. Parses each HTTP request (method, URL, headers, body)
 3. Dispatches to your view functions via the routing table
 4. Serialises the return value into an HTTP response
 
-To stop the server: press **Ctrl+C** in the terminal.
+To stop the server: press Ctrl+C in the terminal.
 
 ## 4. Make some first changes to your app <a class="anchor" id="changes"></a>
 
@@ -232,7 +232,7 @@ HTML **tags** like `<h1>` tell the browser how to render text. `<h1>` is the lar
 
 After saving, you need to restart the server to see the change:
 
-1. Stop it with **Ctrl+C**
+1. Stop it with Ctrl+C
 2. Re-run `uv run flask --app flaskapp run`
 3. Refresh your browser
 
@@ -240,7 +240,7 @@ This gets tedious quickly — which is why Flask has debug mode.
 
 ### Debug Mode (Auto-Reload)
 
-**Debug mode** does two things:
+Debug mode does two things:
 
 1. **Hot-reload:** Flask watches your `.py` files for changes and restarts the server automatically the moment you save. You only need to refresh the browser — no manual Ctrl+C and re-run.
 2. **Interactive debugger:** If your code raises an exception, the browser shows a detailed traceback with an interactive console (instead of a generic "500 Internal Server Error").
@@ -260,7 +260,7 @@ Your terminal will now show:
  * Debugger is active!
 ```
 
-**Alternatively**, you can add these lines to the bottom of `flaskapp.py` and run the file directly with Python:
+Alternatively, you can add these lines to the bottom of `flaskapp.py` and run the file directly with Python:
 
 ```python
 if __name__ == '__main__':
@@ -275,7 +275,7 @@ uv run python flaskapp.py
 
 The `if __name__ == '__main__':` guard ensures that `app.run()` is only called when you run the script directly, not when Flask imports it as a module.
 
-> **Security note:** Never run debug mode in production. The interactive debugger allows arbitrary Python code execution in the browser — only enable it on your local machine.
+> Security note: Never run debug mode in production. The interactive debugger allows arbitrary Python code execution in the browser — only enable it on your local machine.
 
 ## 5. Create new pages with routing <a class="anchor" id="newpages"></a>
 
@@ -321,7 +321,7 @@ def home():
 
 Flask will call `home()` for either URL.
 
-> **Important:** Every view function name must be unique. If you define two functions both called `home`, Python will silently overwrite the first one and Flask will only register the second. Use distinct names like `home`, `about`, `hello`, etc.
+> Important: Every view function name must be unique. If you define two functions both called `home`, Python will silently overwrite the first one and Flask will only register the second. Use distinct names like `home`, `about`, `hello`, etc.
 
 ## 6. Pass variables through the URL <a class="anchor" id="variables"></a>
 
@@ -375,9 +375,9 @@ The template engine Flask uses is called **Jinja2** (the same engine used by Ans
 
 ### Setting up the template directory
 
-Flask automatically looks for templates in a folder called `templates/` that lives in the **same directory as your `flaskapp.py`** file.
+Flask automatically looks for templates in a folder called `templates/` that lives in the same directory as your `flaskapp.py` file.
 
-**Required directory structure:**
+Required directory structure:
 
 ```
 my_flask_app/
@@ -405,7 +405,7 @@ my_flask_app/
 </html>
 ```
 
-This is a **minimal valid HTML document**. Every HTML file has the same outer skeleton:
+This is a minimal valid HTML document. Every HTML file has the same outer skeleton:
 
 - `<!doctype html>` — tells the browser this is HTML5
 - `<head>` — metadata (title, CSS, etc.) — not visible on the page
@@ -570,14 +570,14 @@ Now visit `http://localhost:5000/fibonacci/10` in your browser!
 
 This demonstrates:
 
-- **URL parameters with type conversion** (`<int:n>`)
-- **Error handling** (returning 400 for invalid input)
-- **JSON responses** (Flask automatically converts dicts to JSON)
+- URL parameters with type conversion (`<int:n>`)
+- Error handling (returning 400 for invalid input)
+- JSON responses (Flask automatically converts dicts to JSON)
 
 <details>
 <summary><b>Question:</b> What HTTP status code should we return for invalid input, and why?</summary>
 
-**Answer:** We return 400 (Bad Request) because the client provided invalid input (negative number). This follows REST conventions:
+Answer: We return 400 (Bad Request) because the client provided invalid input (negative number). This follows REST conventions:
 
 - 200: Success
 - 400: Client error (bad input)
@@ -591,7 +591,7 @@ Proper status codes help API consumers handle errors programmatically.
 
 Go through the steps above (sections 1-9) to create your first Flask app.
 
-**Verification checklist:**
+Verification checklist:
 
 - [ ] Ran `uv add flask` from the `week-03/` directory
 - [ ] Created `flaskapp.py` with a basic route
@@ -605,12 +605,12 @@ Go through the steps above (sections 1-9) to create your first Flask app.
 <details>
 <summary><b>Comprehension Check:</b> Why do we use `render_template()` instead of returning HTML strings directly?</summary>
 
-**Answer:** Using `render_template()` separates presentation (HTML) from logic (Python), making code:
+Answer: Using `render_template()` separates presentation (HTML) from logic (Python), making code:
 
-1. **More maintainable** - HTML changes don't require Python changes
-2. **More reusable** - Templates can be shared across routes
-3. **More powerful** - Jinja2 provides loops, conditionals, inheritance
-4. **Cleaner** - No messy string concatenation in Python
+1. More maintainable - HTML changes don't require Python changes
+2. More reusable - Templates can be shared across routes
+3. More powerful - Jinja2 provides loops, conditionals, inheritance
+4. Cleaner - No messy string concatenation in Python
 </details>
 
 ### Exercise 2: Handle Missing URL Parameters
@@ -632,7 +632,7 @@ def hello(city=None):
         return f"<h1>Hello, {city}!</h1>"
 ```
 
-**Alternatively** (and this would be the more elegant and scalable way to do this) is to deal with the case of the city variable not being specified (aka being `None`) in a template. In this case, your `hello` function would look like this:
+Alternatively (and this would be the more elegant and scalable way to do this) is to deal with the case of the city variable not being specified (aka being `None`) in a template. In this case, your `hello` function would look like this:
 
 ```python
 @app.route("/hello")
@@ -745,7 +745,7 @@ Create `templates/layout.html`:
 </html>
 ```
 
-**Key concepts:**
+Key concepts:
 
 - `{% block name %}...{% endblock %}` defines replaceable sections
 - `{{ url_for('function_name') }}` generates URLs dynamically
@@ -794,7 +794,7 @@ nav a:hover {
 <details>
 <summary><b>Full Solution</b></summary>
 
-**layout.html:**
+layout.html:
 ```html
 <!doctype html>
 <html>
@@ -819,7 +819,7 @@ nav a:hover {
 </html>
 ```
 
-**about.html:**
+about.html:
 ```html
 {% extends "layout.html" %}
 
@@ -835,10 +835,10 @@ nav a:hover {
 <details>
 <summary><b>Comprehension Check:</b> What's the advantage of template inheritance over copy-pasting?</summary>
 
-**Answer:** Template inheritance follows the DRY (Don't Repeat Yourself) principle:
+Answer: Template inheritance follows the DRY (Don't Repeat Yourself) principle:
 
-1. **Single source of truth** - Change the nav once, it updates everywhere
-2. **Consistency** - All pages automatically share the same structure
-3. **Maintainability** - Fixing a bug in the layout fixes it for all pages
-4. **Scalability** - Adding 100 pages doesn't mean copying 100 nav bars
+1. Single source of truth - Change the nav once, it updates everywhere
+2. Consistency - All pages automatically share the same structure
+3. Maintainability - Fixing a bug in the layout fixes it for all pages
+4. Scalability - Adding 100 pages doesn't mean copying 100 nav bars
 </details>
