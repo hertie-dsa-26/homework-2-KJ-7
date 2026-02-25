@@ -49,11 +49,18 @@ Prerequisites: This lab uses Python classes and objects (e.g., `Flask(__name__)`
 
 ## What is Flask?
 
-Flask is a **microframework** for building web applications in Python.
+Flask is a **microframework** for building web applications in Python. It was created by Armin Ronacher in 2010 — originally as an April Fool's Day joke that turned out to be genuinely useful — and has since grown into one of the most widely used Python web frameworks.
 
-- "Micro" means minimal by design — Flask ships with just the essentials: routing, request handling, and templating. Unlike Django, it does not include an ORM, admin interface, or built-in authentication. You add what you need, nothing more.
-- "Micro" does not mean underpowered. Flask can power everything from a simple one-page site to a production API serving millions of requests.
-- Flask is **"Pythonic"**: it follows Python's design philosophy of readability, simplicity, and explicitness. If you understand Python, Flask will feel natural.
+Under the hood, Flask is built on two libraries that handle the hard parts for you:
+
+- **Werkzeug**: the WSGI toolkit that receives raw HTTP requests from the network and turns them into Python objects your code can work with
+- **Jinja2**: the templating engine that lets you build HTML pages with dynamic Python data embedded in them (more on this in section 7)
+
+"Micro" means minimal by design — Flask ships with just the essentials: routing, request handling, and templating. Unlike Django, it does not include a database layer, admin interface, or built-in authentication. You choose what to add, and only what you actually need.
+
+"Micro" does not mean underpowered. Flask can serve everything from a simple one-page site to a production API handling millions of requests per day. Companies including Pinterest, LinkedIn, and Netflix have used Flask in production.
+
+Flask is also **"Pythonic"**: it follows Python's philosophy of readability, simplicity, and explicitness. You will recognise Python idioms — decorators, keyword arguments, context managers — used throughout Flask's API. If you understand Python, Flask will feel natural.
 
 ### Why Flask and not Django?
 
@@ -87,18 +94,61 @@ Flask's job is to:
 3. Call that function and collect its return value
 4. Wrap the return value in an HTTP response and send it back
 
-### Key Concepts at a Glance
+### Key Concepts
 
-| Concept | What it means |
-|---|---|
-| **Route** | A URL pattern (e.g. `/hello`) mapped to a Python function |
-| **View function** | The Python function that handles a request and returns a response |
-| **Template** | An HTML file with `{{ variable }}` placeholders filled in by Flask |
-| **Jinja2** | The templating engine Flask uses (similar to Python f-strings, but for HTML) |
-| **WSGI** | The standard protocol Flask uses to communicate with web servers |
-| **Debug mode** | Flask watches your files and restarts the server when you save changes |
+#### Route
+
+A **route** is a mapping from a URL pattern to a Python function. You define routes using the `@app.route("/path")` decorator. When Flask receives an HTTP request, it scans its routing table for a pattern matching the requested URL and calls the associated function. For example, `@app.route("/hello")` means "whenever someone visits `/hello`, call this function." Routes can include variable segments like `<city>` to capture parts of the URL as arguments.
+
+#### View function
+
+A **view function** is the Python function connected to a route — it runs when that route is matched, and its return value becomes the HTTP response body sent back to the browser. View functions can return plain text, HTML strings, rendered templates, or JSON. The term "view" comes from the MVC architectural pattern (see below): the function's job is to decide what the user sees.
+
+#### Template
+
+A **template** is an HTML file with special placeholder syntax that Flask fills in with Python data before sending it to the browser. Instead of building HTML strings inside Python, you write a normal `.html` file and mark the spots where dynamic content goes. This keeps your Python logic and your HTML presentation cleanly separated.
+
+#### Jinja2
+
+**Jinja2** is the templating engine Flask uses to process template files. It extends plain HTML with three tag types: `{{ expr }}` to output a value, `{% statement %}` for control flow like loops and conditionals, and `{# comment #}` for comments. The syntax is deliberately similar to Python, so there is very little new syntax to learn. Jinja2 is also used by Ansible, SaltStack, and many other tools outside the web context.
+
+#### WSGI
+
+**WSGI** (Web Server Gateway Interface) is the standard Python protocol that defines how a web server passes HTTP requests to a Python application and how the application sends responses back. Flask implements this interface via Werkzeug. In development you use Flask's built-in WSGI server; in production you would place a dedicated WSGI server (like Gunicorn or uWSGI) in front of your Flask app. You rarely interact with WSGI directly — it is the plumbing that makes everything connect.
+
+#### Debug mode
+
+**Debug mode** is a development-only setting that does two things: it automatically reloads the server whenever you save a `.py` file (so you never need to restart manually), and it displays a detailed interactive traceback in the browser when your code raises an exception. Never enable debug mode in production — the interactive console allows arbitrary Python code execution in the browser.
+
+---
 
 You will encounter each of these in the steps below.
+
+### Flask and the MVC Pattern
+
+Most web frameworks are loosely organised around the **Model-View-Controller** (**MVC**) pattern. MVC divides a program into three layers of responsibility so that changes in one area do not ripple through the others.
+
+| Layer | Responsibility | In Flask |
+|---|---|---|
+| **Model** | Data and business logic | Your Python code: algorithms, data classes, database queries |
+| **View** | What the user sees | Jinja2 templates (`.html` files in `templates/`) |
+| **Controller** | Receives requests, coordinates Model and View | Flask routes and view functions |
+
+Flask does not enforce MVC — it imposes no required folder structure and no base classes. But the pattern maps naturally onto every Flask app:
+
+1. A browser sends a request to a URL.
+2. Flask's router (the **Controller**) matches the URL and calls the right view function.
+3. The view function runs whatever Python logic it needs (the **Model**) — perhaps sorting a list, querying a database, or computing a Fibonacci number.
+4. It passes the result to a Jinja2 template (the **View**), which renders it as HTML.
+5. Flask sends the HTML back to the browser.
+
+```
+Browser → [Controller: route + view function] → [Model: Python logic]
+                                                        ↓
+Browser ← [View: Jinja2 template ← rendered HTML] ←────┘
+```
+
+Keeping these three layers separate pays off as your apps grow: business logic stays in Python files, presentation stays in templates, and neither layer needs to know about the other's implementation details.
 
 # Web development resources <a class="anchor" id="resources"></a>
 
