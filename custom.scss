@@ -77,6 +77,18 @@ pre.bash {
 
 /* Code annotations --------------------------------------------------------- */
 
+/* Flush code block bottom edge against annotation list */
+div.code-with-filename:has(+ dl.code-annotation-container-grid) {
+  div.sourceCode {
+    margin-bottom: 0;
+  }
+
+  pre.sourceCode {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
 pre.sourceCode code a.code-annotation-anchor {
   color: $output-color;
   background-color: transparent;
@@ -92,6 +104,10 @@ pre.sourceCode code a.code-annotation-anchor {
 }
 
 dl.code-annotation-container-grid {
+  background-color: $code-block-bg;
+  margin-top: 0;
+  padding: 0.5em 1em;
+  border-radius: 0 0 0.375em 0.375em;
   color: $output-color;
 
   dt {

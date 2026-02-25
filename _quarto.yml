@@ -1,5 +1,4 @@
 toc: true
-number-sections: true
   
 format:
   html:
@@ -13,3 +12,5 @@ filters:
   - jacksonmluckey/repl-mode
 
 repl-highlight-style: monokai
+
+embed-resources: true
