@@ -21,18 +21,6 @@ title: Lab 3
     * [Some HTML and CSS basics](#html)
 * [Exercises](#exercises)
 
-## Why Web Development in a Data Structures & Algorithms Course?
-
-You might wonder why we're learning Flask in a DSA course. Here's the connection:
-
-1. Practical Application: Many algorithms you'll learn (sorting, searching, graph traversal) need interfaces. Building a simple web app lets you visualize and interact with your algorithms.
-
-2. API Design: Later labs will have you build REST APIs that expose algorithmic functionality. Understanding Flask routing is essential for this.
-
-3. Data Flow: Web apps demonstrate key CS concepts: request/response cycles, state management, and the client-server model.
-
-4. Final Project Foundation: Your course project may involve deploying an algorithm as a web service. This lab provides that foundation.
-
 ## Learning Objectives
 
 By completing this lab, you will be able to:
@@ -43,39 +31,38 @@ By completing this lab, you will be able to:
 4. Structure a multi-page application with template inheritance
 5. *(Foundation for future labs)* Understand how to expose Python functions via HTTP endpoints
 
-Prerequisites: This lab uses Python classes and objects (e.g., `Flask(__name__)`). If you need a refresher on OOP, see [Lab 2](lab_2_oop_classes.ipynb).
+Prerequisites: This lab uses Python classes and objects (e.g., `Flask(__name__)`). If you need a refresher on OOP, see the bootcamp materials.
+
+## Why Web Development in a Data Structures & Algorithms Course?
+
+You might wonder why we're learning the **web framework Flask** in a data structures and algorithms course. Reasons include:
+
+- Practical Application: Many algorithms you'll learn this semester (e.g. sorting, searching, graph traversal) need interfaces. Building a simple web app lets you visualize and interact with your algorithms.
+
+- API Design: Later labs will have you build **REST APIs** that expose algorithmic functionality. Understanding Flask routing is essential for this.
+
+- Data Flow: Web apps provide an opportunity to demonstrate key CS concepts, such as request/response cycles, state management, and the client-server model.
+
+- Final Project Foundation: Your course project will involve deploying an algorithm as a web service. This lab (and Flask in general) provides a foundation.
 
 # What is flask and why should we use it? <a class="anchor" id="flask"></a>
 
 ## What is Flask?
 
-Flask is a **microframework** for building web applications in Python. It was created by Armin Ronacher in 2010 — originally as an April Fool's Day joke that turned out to be genuinely useful — and has since grown into one of the most widely used Python web frameworks.
+Flask is a **microframework** for building web applications in Python. It was created by Armin Ronacher in 2010 and has grown into one of the most widely used Python web frameworks (alongside Django).
 
 Under the hood, Flask is built on two libraries that handle the hard parts for you:
 
-- **Werkzeug**: the WSGI toolkit that receives raw HTTP requests from the network and turns them into Python objects your code can work with
-- **Jinja2**: the templating engine that lets you build HTML pages with dynamic Python data embedded in them (more on this in section 7)
+- **Werkzeug**: the **WSGI** toolkit that receives raw HTTP requests from the network and turns them into Python objects your code can work with.
+- **Jinja2**: the templating engine that lets you build HTML pages with dynamic Python data embedded in them (more on this in section 7).
 
-"Micro" means minimal by design — Flask ships with just the essentials: routing, request handling, and templating. Unlike Django, it does not include a database layer, admin interface, or built-in authentication. You choose what to add, and only what you actually need.
+"Micro" means minimal by design, not underpowered or limited. Flask ships with just the essentials: routing, request handling, and templating. Unlike Django, it does not include a database layer, admin interface, or built-in authentication.
 
-"Micro" does not mean underpowered. Flask can serve everything from a simple one-page site to a production API handling millions of requests per day. Companies including Pinterest, LinkedIn, and Netflix have used Flask in production.
-
-Flask is also **"Pythonic"**: it follows Python's philosophy of readability, simplicity, and explicitness. You will recognise Python idioms — decorators, keyword arguments, context managers — used throughout Flask's API. If you understand Python, Flask will feel natural.
-
-### Why Flask and not Django?
-
-| | Flask | Django |
-|---|---|---|
-| Philosophy | Micro, bring your own pieces | Batteries included |
-| Learning curve | Gentle | Steeper |
-| Flexibility | Very high | More opinionated |
-| Best for | APIs, microservices, learning | Full-featured web apps |
-
-For this course, Flask is the right choice: we want a thin layer that exposes our Python algorithms over HTTP without fighting a large framework.
+Flask is also **"Pythonic"**. Its design typically follows Python's philosophy of readability, simplicity, and explicitness. You will recognise Python idioms, such as decorators, keyword arguments, and context managers, throughout Flask's API. If you understand Python, Flask will feel natural.
 
 ### How Flask Works: The Request-Response Cycle
 
-Every web framework is built around one fundamental idea: a browser sends a request, the server sends back a response.
+Like most web frameworks, Flask is is built around one fundamental idea: a browser sends a **request** and the server sends back a **response**.
 
 ```
 Browser (client)          Flask (server)           Your Python code
@@ -89,44 +76,40 @@ Browser (client)          Flask (server)           Your Python code
 
 Flask's job is to:
 
-1. Listen for incoming HTTP requests on a port (default: 5000)
-2. Match the URL to the right Python function (routing)
+1. Listen for incoming **HTTP requests** on a **port** (default: 5000)
+2. Match the URL to the right Python function (**routing**)
 3. Call that function and collect its return value
-4. Wrap the return value in an HTTP response and send it back
+4. Wrap the return value in an **HTTP response** and send it back to the requestor
 
 ### Key Concepts
 
 #### Route
 
-A **route** is a mapping from a URL pattern to a Python function. You define routes using the `@app.route("/path")` decorator. When Flask receives an HTTP request, it scans its routing table for a pattern matching the requested URL and calls the associated function. For example, `@app.route("/hello")` means "whenever someone visits `/hello`, call this function." Routes can include variable segments like `<city>` to capture parts of the URL as arguments.
+A **route** maps a URL pattern to a Python function. Routes are defined using the `@app.route("/path")` **decorator**. When a Flask application receives an HTTP request, it scans its **routing table** for a pattern matching the requested URL and calls the associated function. For example, `@app.route("/hello")` means "whenever someone visits `/hello`, call this function." Routes can include variable segments like `<city>` to capture parts of the URL as arguments. You've probably seen this before with `?` suffixes in URLs.
 
 #### View function
 
-A **view function** is the Python function connected to a route — it runs when that route is matched, and its return value becomes the HTTP response body sent back to the browser. View functions can return plain text, HTML strings, rendered templates, or JSON. The term "view" comes from the MVC architectural pattern (see below): the function's job is to decide what the user sees.
+A **view function** is the Python function connected to a route. It runs when its routemis matched, and its return value becomes the HTTP response body sent back to the browser. The function's job is to decide what the user sees. View functions can return plain text, HTML strings, rendered templates, or JSON. The term "view" comes from the **model-view-controller (MVC) architectural pattern** (described below).
 
 #### Template
 
-A **template** is an HTML file with special placeholder syntax that Flask fills in with Python data before sending it to the browser. Instead of building HTML strings inside Python, you write a normal `.html` file and mark the spots where dynamic content goes. This keeps your Python logic and your HTML presentation cleanly separated.
+A **template** is an HTML file with special syntax that Flask processes and fills in with data before sending it to the browser. Instead of building HTML strings inside Python, you write a normal `.html` file and mark the spots where **dynamic content** goes. This keeps your Python logic and your HTML presentation cleanly separated.
 
 #### Jinja2
 
-**Jinja2** is the templating engine Flask uses to process template files. It extends plain HTML with three tag types: `{{ expr }}` to output a value, `{% statement %}` for control flow like loops and conditionals, and `{# comment #}` for comments. The syntax is deliberately similar to Python, so there is very little new syntax to learn. Jinja2 is also used by Ansible, SaltStack, and many other tools outside the web context.
+**Jinja2** is the templating engine Flask uses to process template files. It extends plain HTML with three tag types: `{{ expr }}` to output a value, `{% statement %}` for control flow (e.g. loops and conditionals), and `{# comment #}` for comments. The syntax is deliberately similar to Python, so there is very little new syntax to learn. Jinja2 is also used by many other tools.
 
 #### WSGI
 
-**WSGI** (Web Server Gateway Interface) is the standard Python protocol that defines how a web server passes HTTP requests to a Python application and how the application sends responses back. Flask implements this interface via Werkzeug. In development you use Flask's built-in WSGI server; in production you would place a dedicated WSGI server (like Gunicorn or uWSGI) in front of your Flask app. You rarely interact with WSGI directly — it is the plumbing that makes everything connect.
+**Web Server Gateway Interface (WSGI)** is a standard protocol that defines how a web server passes HTTP requests to an application and how the application sends responses back. Flask implements this **interface** via Werkzeug. In development you use Flask's built-in WSGI server, while in production you would use a real WSGI server in front of your Flask app. You rarely interact with WSGI directly. Think of it as the plumbing that makes everything connect.
 
 #### Debug mode
 
-**Debug mode** is a development-only setting that does two things: it automatically reloads the server whenever you save a `.py` file (so you never need to restart manually), and it displays a detailed interactive traceback in the browser when your code raises an exception. Never enable debug mode in production — the interactive console allows arbitrary Python code execution in the browser.
-
----
-
-You will encounter each of these in the steps below.
+**Debug mode** is a development-only setting that automatically reloads the server whenever you save a `.py` file (so you don't need to restart manually) and displays a detailed interactive traceback in the browser when your code raises an **exception**. Don't enable debug mode in production, as the interactive console allows for arbitrary Python code execution in the browser, which is useful for debugging and experimenting but beyond terrible for security.
 
 ### Flask and the MVC Pattern
 
-Most web frameworks are loosely organised around the **Model-View-Controller** (**MVC**) pattern. MVC divides a program into three layers of responsibility so that changes in one area do not ripple through the others.
+Most web frameworks are loosely organised around the **Model-View-Controller (MVC)** pattern. MVC divides a program into three layers of responsibility so that changes in one area do not ripple through the others.
 
 | Layer | Responsibility | In Flask |
 |---|---|---|
@@ -142,23 +125,15 @@ Flask does not enforce MVC — it imposes no required folder structure and no ba
 4. It passes the result to a Jinja2 template (the **View**), which renders it as HTML.
 5. Flask sends the HTML back to the browser.
 
-```
-Browser → [Controller: route + view function] → [Model: Python logic]
-                                                        ↓
-Browser ← [View: Jinja2 template ← rendered HTML] ←────┘
-```
+Keeping these three layers separate pays off as your apps grow in size and complexity. Business logic stays in Python files, the presentation layer stays in templates, and neither layer needs to know about the other's implementation details. This makes future changes easier.
 
-Keeping these three layers separate pays off as your apps grow: business logic stays in Python files, presentation stays in templates, and neither layer needs to know about the other's implementation details.
+# Resources <a class="anchor" id="resources"></a>
 
-# Web development resources <a class="anchor" id="resources"></a>
-
-There are many good tutorials for creating flask apps, here is a selection:
-
-* the [Quickstart](https://flask.palletsprojects.com/en/3.0.x/quickstart/) example is a great place to start building flask apps
-* this [YouTube series](https://www.youtube.com/watch?v=MwZwr5Tvyxo&list=PL-osiE80TeTs4UjLw5MM6OjgkjFeUxCYH) is a more detailed step-by-step tutorial for how to build a web app in flask (the first two are relevant for this lab)
-* to lookup how to create templates in your flask app, use this [flask templates CHEATSHEET](https://www.codecademy.com/learn/learn-flask/modules/flask-templates-and-forms/cheatsheet)
-* to get started with creating content for the individual pages of your app, use this interactive [HTML CHEATSHEET](https://htmlcheatsheet.com/)
-* for styling your pages, there is also a useful [CSS CHEATSHEET](https://htmlcheatsheet.com/css/) on the same website
+- [Flask Quickstart](https://flask.palletsprojects.com/en/3.1.x/quickstart/) example is a great place to start building flask apps
+- [Jinja2 Templates](https://jinja.palletsprojects.com/en/stable/templates/)
+- [HTML Cheatsheet](https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Cheatsheet)
+- [CSS Quickstart](https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Styling_the_content)
+- [CSS Overview and Tutorials](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics)
 
 # Create your first flask app <a class="anchor" id="first"></a>
 
