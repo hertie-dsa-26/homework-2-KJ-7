@@ -9,3 +9,6 @@ dependencies = [
     "pygments>=2.19.2",
     "quarto>=0.1.0",
 ]
+
+[tool.uv.workspace]
+exclude = ["my_flask_app"]
