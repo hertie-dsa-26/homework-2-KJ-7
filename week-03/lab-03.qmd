@@ -39,11 +39,8 @@ Prerequisites: This lab uses Python classes and objects (e.g., `Flask(__name__)`
 You might wonder why we're learning the **web framework** **Flask** in a data structures and algorithms course. Reasons include:
 
 - Practical Application: Many algorithms you'll learn this semester (e.g. sorting, searching, graph traversal) need interfaces. Building a simple web app lets you visualize and interact with your algorithms.
-
 - API Design: Later labs will have you build **REST APIs** that expose algorithmic functionality. Understanding Flask routing is essential for this.
-
 - Data Flow: Web apps provide an opportunity to demonstrate key CS concepts, such as request/response cycles, state management, and the client-server model.
-
 - Final Project Foundation: Your course project will involve deploying an algorithm as a web service. This lab (and Flask in general) provides a foundation.
 
 ## Additional Resources <a class="anchor" id="resources"></a>
@@ -132,7 +129,7 @@ Flask does not enforce/require MVC but the pattern maps naturally onto every Fla
 4. It passes the result to a Jinja2 template (the **View**), which renders it as HTML.
 5. Flask sends the HTML back to the browser.
 
-Keeping these three layers separate pays off as your apps grow in size and complexity. Business logic stays in Python files, the presentation layer stays in templates, and neither layer needs to know about the other's implementation details. This makes future changes easier.
+Keeping these three layers separate pays off as your apps grow in size and complexity. Business logic stays in Python files, the presentation layer stays in templates, and (hopefully) neither layer needs to know about the other's implementation details. This makes future changes easier.
 
 # Create your first flask app <a class="anchor" id="first"></a>
 
@@ -303,13 +300,12 @@ def hello():
     return "<h1>Hello, Berlin!</h1>"
 ```
 
-The routing table now looks like this:
+The routing table is now:
 
-```
-URL path        View function     Response
-/               home()            "Home Page"
-/hello          hello()           "<h1>Hello, Berlin!</h1>"
-```
+| URL path | View function | Response |
+|----------|---------------|----------|
+| / | `home()` | "Home Page" |
+| /hello | `hello()` | "<h1>Hello, Berlin!</h1>" |
 
 Visit `http://localhost:5000/hello` to see your new page.
 
@@ -795,7 +791,7 @@ Modify `templates/home.html`:
 2. Update `about.html` to extend `layout.html`
 3. Add basic CSS styling to the nav (horizontal layout, hover effects)
 
-#### Hint: Making nav links horizontal with CSS
+##### Hint: Making nav links horizontal with CSS
 
 ::: {.callout-tip collapse="true"}
 ## Hint
@@ -1055,7 +1051,7 @@ Add a checkbox to the form that lets users chose to see the full sequence alongs
 
 Use a `show_sequence` query parameter (e.g. `/fibonacci?n=7&show_sequence=true`) to toggle this behavior.
 
-**Hints:**
+##### Hints:
 
 - Add a checkbox input with `name="show_sequence" value="true"` to the form. Browsers only include checked checkboxes in the query string.
 - In the route, read the `show_sequence` query parameter with `request.args.get("show_sequence")` and build the sequence list only when it's set.
