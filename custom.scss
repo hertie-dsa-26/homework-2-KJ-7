@@ -114,7 +114,7 @@ dl.code-annotation-container-grid {
   background-color: $code-block-bg;
   margin-top: 0;
   border-top: 1px solid $output-color;
-  padding: 0.5em 1em;
+  padding: 0.75em 1em;
   border-radius: 0 0 0.375em 0.375em;
   color: $output-color;
 
@@ -136,7 +136,7 @@ dl.code-annotation-container-grid {
    border-bottom adds the white separator line between the label and code. */
 .code-with-filename .code-with-filename-file {
   background-color: $code-block-bg;
-  padding: 0.5em 1em;
+  padding: 0.75em 1em;
   border-radius: 0.375em 0.375em 0 0;
   border: none;
   border-bottom: 1px solid $output-color;
@@ -155,9 +155,20 @@ dl.code-annotation-container-grid {
 }
 
 /* Remove top radius from the code block so it connects flush to the
-   filename bar above it. */
+   filename bar above it. Also add top padding so code isn't flush against
+   the white dividing line. */
 .code-with-filename div.sourceCode,
 .code-with-filename pre.sourceCode {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+}
+
+.code-with-filename pre.sourceCode {
+  padding-top: 0.5em;
+}
+
+/* Add bottom padding to the code block when followed by an annotation
+   container, so code isn't flush against the white dividing line below. */
+div.code-with-filename:has(+ dl.code-annotation-container-grid) pre.sourceCode {
+  padding-bottom: 0.5em;
 }
