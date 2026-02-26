@@ -77,7 +77,9 @@ pre.bash {
 
 /* Code annotations --------------------------------------------------------- */
 
-/* Flush code block bottom edge against annotation list */
+/* Remove bottom radius from the code block so it connects flush to the
+   annotation container below it. Both div.sourceCode and pre.sourceCode
+   need this — Quarto's defaults apply radius to both elements. */
 div.code-with-filename:has(+ dl.code-annotation-container-grid) {
   div.sourceCode {
     margin-bottom: 0;
@@ -105,6 +107,9 @@ pre.sourceCode code a.code-annotation-anchor {
   color: $output-color;
 }
 
+/* White separator line at the top of the annotation container, visually
+   dividing it from the code block above. border-top sits outside the
+   padding box, so it connects flush to the code block (margin-top: 0). */
 dl.code-annotation-container-grid {
   background-color: $code-block-bg;
   margin-top: 0;
@@ -126,10 +131,14 @@ dl.code-annotation-container-grid {
 
 /* Code-with-filename header ------------------------------------------------ */
 
+/* Style the filename label bar with the same dark background as the code
+   block. border: none overrides Quarto's default gray border on this element;
+   border-bottom adds the white separator line between the label and code. */
 .code-with-filename .code-with-filename-file {
   background-color: $code-block-bg;
   padding: 0.5em 1em;
   border-radius: 0.375em 0.375em 0 0;
+  border: none;
   border-bottom: 1px solid $output-color;
 
   pre {
@@ -145,6 +154,8 @@ dl.code-annotation-container-grid {
   }
 }
 
+/* Remove top radius from the code block so it connects flush to the
+   filename bar above it. */
 .code-with-filename div.sourceCode,
 .code-with-filename pre.sourceCode {
   border-top-left-radius: 0;
