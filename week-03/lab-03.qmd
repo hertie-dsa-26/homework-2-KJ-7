@@ -793,7 +793,7 @@ Modify `templates/home.html`:
 
 ##### Hint: Making nav links horizontal with CSS
 
-::: {.callout-tip collapse="true"}
+::: {.callout-note collapse="true"}
 ## Hint
 
 ```css

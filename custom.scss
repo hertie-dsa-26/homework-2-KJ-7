@@ -6,6 +6,13 @@ $code-bg:       #F0E0D6;
 $code-block-bg: #272822;
 $output-color:  #FFFFFF;
 
+/* Callout colors — muted, warm-toned to harmonize with the linen background */
+$callout-color-note:      #4a6fa5; /* muted blue       */
+$callout-color-tip:       #5c7a4e; /* sage green        */
+$callout-color-important: #8b4049; /* rose/wine         */
+$callout-color-caution:   #b5743a; /* warm amber        */
+$callout-color-warning:   #c4522a; /* terracotta red    */
+
 
 /*-- scss:rules --*/
 
