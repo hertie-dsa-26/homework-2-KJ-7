@@ -27,13 +27,16 @@ By completing this lab, you will be able to:
 2. Create routes that handle different URL patterns
 3. Pass data between Python backend and HTML templates
 4. Structure a multi-page application with template inheritance
-5. *(Foundation for future labs)* Understand how to expose Python functions via HTTP endpoints
+5. Understand how to expose Python functions via HTTP endpoints (Foundation for future labs)
 
-Prerequisites: This lab uses Python classes and objects (e.g., `Flask(__name__)`). If you need a refresher on OOP, see the bootcamp materials.
+Prerequisites: This lab uses Python classes and objects (e.g., `Flask(__name__)`). If you're not comfortable with the basics of object-oriented programming (OOP), see the *Programming Paradigms and Object-Oriented Programming (OOP) in Python* bootcamp materials:
+
+- [Tutorial](https://github.com/Hertie-MDS-Bootcamps/winter-2026-python-bootcamp/blob/main/tutorials/python-objects.html)
+- [Exercises](https://github.com/Hertie-MDS-Bootcamps/winter-2026-python-bootcamp/blob/main/exercises/python-objects.ipynb)
 
 ## Why Web Development in a Data Structures & Algorithms Course?
 
-You might wonder why we're learning the **web framework Flask** in a data structures and algorithms course. Reasons include:
+You might wonder why we're learning the **web framework** **Flask** in a data structures and algorithms course. Reasons include:
 
 - Practical Application: Many algorithms you'll learn this semester (e.g. sorting, searching, graph traversal) need interfaces. Building a simple web app lets you visualize and interact with your algorithms.
 
@@ -55,14 +58,14 @@ You might wonder why we're learning the **web framework Flask** in a data struct
 
 ## What is Flask?
 
-Flask is a **microframework** for building web applications in Python. It was created by Armin Ronacher in 2010 and has grown into one of the most widely used Python web frameworks (alongside Django).
+[**Flask**](https://flask.palletsprojects.com/en/stable/) is a **microframework** for building web applications in Python. It was created by Armin Ronacher in 2010 and has grown into one of the most widely used Python web frameworks (alongside others like [Django](https://www.djangoproject.com/)).
 
 Under the hood, Flask is built on two libraries that handle the hard parts for you:
 
 - **Werkzeug**: the **WSGI** toolkit that receives raw HTTP requests from the network and turns them into Python objects your code can work with.
 - **Jinja2**: the templating engine that lets you build HTML pages with dynamic Python data embedded in them (more on this in section 7).
 
-"Micro" means minimal by design, not underpowered or limited. Flask ships with just the essentials: routing, request handling, and templating. Unlike Django, it does not include a database layer, admin interface, or built-in authentication.
+"Micro" means minimal by design, not underpowered or limited. Flask ships with just the essentials: **routing**, **request handling**, and **templating**. Unlike Django, it does not include a database layer, admin interface, or built-in authentication.
 
 Flask is also **"Pythonic"**. Its design typically follows Python's philosophy of readability, simplicity, and explicitness. You will recognise Python idioms, such as decorators, keyword arguments, and context managers, throughout Flask's API. If you understand Python, Flask will feel natural.
 
@@ -117,7 +120,7 @@ Most web frameworks are loosely organised around the **Model-View-Controller (MV
 
 | Layer | Responsibility | In Flask |
 |---|---|---|
-| **Model** | Data and business logic | Your Python code: algorithms, data classes, database queries |
+| **Model** | Data and business logic | Your Python code: algorithms, (data) classes, database queries |
 | **View** | What the user sees | Jinja2 templates (`.html` files in `templates/`) |
 | **Controller** | Receives requests, coordinates Model and View | Flask routes and view functions |
 
@@ -173,10 +176,10 @@ def home():               # <4>
 ```
 
 1. Imports the `Flask` class from the `flask` package. Everything in a Flask app flows through an instance of this class.
-2. Creates your application object. The `__name__` argument tells Flask where this module lives so it can find resources like templates and static files *relative to this file*. When you run `flaskapp.py` directly, `__name__` equals `"__main__"`; when it is imported, `__name__` is `"flaskapp"`. Either way, Flask resolves file paths correctly.
-3. This is a **decorator** — a Python feature that wraps one function with another. Here, `app.route("/")` registers the decorated function in Flask's routing table: "when someone visits `/`, call `home()`." Decorators always appear directly above the function they modify, prefixed with `@`.
+2. Creates your **application object**. The `__name__` argument tells Flask where this module lives so it can find resources like templates and static files *relative to this file*. When you run `flaskapp.py` directly, `__name__` equals `"__main__"`; when it is imported, `__name__` is `"flaskapp"`. Either way, Flask resolves file paths correctly.
+3. This is a **decorator**: a Python feature that wraps one function with another. Here, `app.route("/")` registers the decorated function in Flask's **routing table**. For example, when someone visits `/`, call `home()`. Decorators always appear directly above the function they modify, prefixed with `@`.
 4. The **view function**. Flask calls this whenever the route is matched.
-5. The return value becomes the HTTP response body. You can return plain text, HTML strings, or (later) rendered templates.
+5. The return value becomes the **HTTP response body**. You can return plain text, HTML strings, or (later) rendered templates.
 
 Note: Do not name it `flask.py`, as that would overlap with the Flask package itself and cause an import error.
 
@@ -286,7 +289,7 @@ Then:
 uv run python flaskapp.py
 ```
 
-The `if __name__ == '__main__':` ensures that `app.run()` is only called when you run the script directly, not when Flask imports it as a module.
+The `if __name__ == '__main__':` idiom ensures that `app.run()` is only called when you run the script directly, not when Flask imports it as a module. This is the same idea as using said idiom for (command line interface) scripts.
 
 ## 5. Create new pages with routing <a class="anchor" id="newpages"></a>
 
@@ -371,16 +374,13 @@ You will use `<int:n>` in the Fibonacci route in the preview section. It ensures
 
 ### URL encoding
 
-Spaces and special characters are not allowed in URLs. The browser automatically encodes them:
-
-- space becomes `%20`
-- `/hello/New York` becomes `/hello/New%20York`
+Spaces and special characters are not allowed in URLs. The browser automatically encodes them. For example, space is replaced by `%20`, so `/hello/New York` becomes `/hello/New%20York`. Think of escaping characters with a backslash.
 
 Flask decodes `%20` back to a space before passing the value to your function, so `city` will equal `"New York"` (with a space) in Python.
 
 ## 7. Add more content using templates <a class="anchor" id="templates"></a>
 
-Embedding HTML directly in Python return statements works for trivial pages, but it scales poorly. Flask solves this with **templates**, which separate HTML files that can contain placeholders for **dynamic content**.
+Embedding HTML directly in Python return statements works for trivial pages, but it scales poorly. Flask solves this with **templates**, which are HTML files that can contain placeholders for **dynamic content**.
 
 The template engine Flask uses is called **Jinja2** (the same engine used by many other tools). You write HTML as normal and include `{{ variable }}` placeholders and `{% control flow %}` blocks wherever you need Python data.
 
@@ -618,17 +618,17 @@ Verification checklist:
 - [ ] Created a `templates/` directory with `home.html`
 - [ ] Used `render_template()` to serve the template
 
-#### Comprehension Check: Why do we use `render_template()` instead of returning HTML strings directly?
+#### Question: Why do we use `render_template()` instead of returning HTML strings directly?
 
 ::: {.callout-note collapse="true"}
 ## Answer
 
 Using `render_template()` separates presentation (HTML) from logic (Python), making code:
 
-1. More maintainable - HTML changes don't require Python changes
-2. More reusable - Templates can be shared across routes
-3. More powerful - Jinja2 provides loops, conditionals, inheritance
-4. Cleaner - No messy string concatenation in Python
+1. More maintainable: HTML changes don't require Python changes
+2. More reusable: Templates can be shared across routes
+3. More powerful: Jinja2 provides loops, conditionals, inheritance
+4. Cleaner: No messy string concatenation in Python
 :::
 
 ### Exercise 2: Handle Missing URL Parameters
@@ -740,7 +740,7 @@ def about():
 
 This exercise introduces **template inheritance**, a powerful Flask/Jinja2 feature for avoiding code duplication.
 
-#### Step 5.1: Understand the Problem
+#### Step 5.1: Understand the Problem Inheritance Solves
 
 Currently, if you want a navigation bar on every page, you'd have to copy the HTML to each template. What if you have 10 pages? 100? Template inheritance solves this.
 
@@ -857,22 +857,24 @@ nav a:hover {
 ```
 :::
 
-#### Comprehension Check: What's the advantage of template inheritance over copy-pasting?
+#### Question: What's the advantage of template inheritance over copy-pasting?
 
 ::: {.callout-note collapse="true"}
 ## Answer
 
-Template inheritance follows the DRY (Don't Repeat Yourself) principle:
+Template inheritance follows the **DRY (Don't Repeat Yourself)** principle:
 
-1. Single source of truth - Change the nav once, it updates everywhere
-2. Consistency - All pages automatically share the same structure
-3. Maintainability - Fixing a bug in the layout fixes it for all pages
-4. Scalability - Adding 100 pages doesn't mean copying 100 nav bars
+1. **Single source of truth**: Change the nav once, it updates everywhere
+2. Consistency: All pages automatically share the same structure
+3. Maintainability: Fixing a bug in the layout fixes it for all pages
+4. Scalability: Adding 100 pages doesn't mean copying 100 nav bars
 :::
 
 ### Exercise 6: Fibonacci Calculator Page
 
-Build a Fibonacci Calculator page that connects the `fibonacci_api` route from the preview section to an HTML interface. This exercise combines everything from the lab: routes, URL parameters, templates, and template inheritance.
+Build a Fibonacci Calculator page that lets users enter a number and see the result.
+
+This exercise combines routes, query parameters, templates, and template inheritance.
 
 #### Step 6.1: Add the API Route
 
@@ -897,19 +899,37 @@ def fibonacci_api(n):
 
 Visit `http://localhost:5000/fibonacci/10` to confirm it returns JSON like `{"fibonacci": 55, "n": 10}`.
 
-#### Step 6.2: Add a Landing Page Route
+#### Step 6.2: Add a Page Route
 
-The API route returns JSON, but we need a separate route that renders an HTML form. Add this to `flaskapp.py`:
+The API route above returns JSON. To display a proper HTML page, add a separate route that reads `n` from the **URL query string** (`?n=10`), computes the result server-side, and passes it to the template.
 
 ```{.python filename="flaskapp.py"}
+from flask import request
+
 @app.route("/fibonacci")
 def fibonacci_page():
-    return render_template("fibonacci.html")
+    n_str = request.args.get("n")
+    result = None
+    error = None
+    if n_str is not None:
+        n = int(n_str)
+        if n < 0:
+            error = "n must be non-negative"
+        elif n <= 1:
+            result = {"n": n, "fibonacci": n}
+        else:
+            prev, curr = 0, 1
+            for _ in range(2, n + 1):
+                prev, curr = curr, prev + curr
+            result = {"n": n, "fibonacci": curr}
+    return render_template("fibonacci.html", result=result, error=error)
 ```
+
+`request.args` is a dictionary-like object Flask populates from **URL query parameters**. When the form submits, the browser navigates to `/fibonacci?n=10` and Flask reads `n` from that URL. If you haven't noticed before, the `?` suffix is frequently used in URLs for this purpose.
 
 #### Step 6.3: Create the Template
 
-Create `templates/fibonacci.html`. The form submits to the API route using a GET request, but since the API expects the number in the URL (not as a query parameter), we'll use a small JavaScript redirect:
+Create `templates/fibonacci.html`. The form uses `method="GET"` so the input to the form becomes a query parameter, and Jinja2 conditionally renders the result.
 
 ```{.html filename="templates/fibonacci.html"}
 {% extends "layout.html" %}
@@ -920,39 +940,28 @@ Create `templates/fibonacci.html`. The form submits to the API route using a GET
 <h1>Fibonacci Calculator</h1>
 <p>Enter a non-negative integer to calculate its Fibonacci number.</p>
 
-<form onsubmit="goToResult(event)">
+<form method="GET" action="/fibonacci">
     <label for="n">n:</label>
     <input type="number" id="n" name="n" min="0" required>
     <button type="submit">Calculate</button>
 </form>
 
-<div id="result"></div>
-
-<script>
-function goToResult(event) {
-    event.preventDefault();
-    const n = document.getElementById("n").value;
-    fetch("/fibonacci/" + n)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                document.getElementById("result").innerText = "Error: " + data.error;
-            } else {
-                document.getElementById("result").innerText =
-                    "fibonacci(" + data.n + ") = " + data.fibonacci;
-            }
-        });
-}
-</script>
+{% if error %}
+<p>Error: {{ error }}</p>
+{% elif result %}
+<p>fibonacci({{ result.n }}) = {{ result.fibonacci }}</p>
+{% endif %}
 {% endblock %}
 ```
 
+When the form is submitted, the browser navigates to `/fibonacci?n=10`. Flask handles it server-side (i.e. computes it with Python) and re-renders the page with the result embedded in the HTML.
+
 #### Step 6.4: Your Task
 
-1. Add the `fibonacci_page` route to `flaskapp.py`
+1. Add the `fibonacci_page` route to `flaskapp.py` (Hint: don't forget `from flask import request`)
 2. Create `templates/fibonacci.html` extending `layout.html`
 3. Add a "Fibonacci" link to the nav in `layout.html`
-4. Test it: visit `http://localhost:5000/fibonacci`, enter a number, and verify the result
+4. Test it by visiting `http://localhost:5000/fibonacci`, entering a number, and verifying the result.
 
 #### Full Solution
 
@@ -960,9 +969,7 @@ function goToResult(event) {
 ## Full Solution
 
 ```{.python filename="flaskapp.py (additions)"}
-@app.route("/fibonacci")
-def fibonacci_page():
-    return render_template("fibonacci.html")
+from flask import request
 
 @app.route("/fibonacci/<int:n>")
 def fibonacci_api(n):
@@ -974,6 +981,24 @@ def fibonacci_api(n):
     for _ in range(2, n + 1):
         prev, curr = curr, prev + curr
     return {"n": n, "fibonacci": curr}
+
+@app.route("/fibonacci")
+def fibonacci_page():
+    n_str = request.args.get("n")
+    result = None
+    error = None
+    if n_str is not None:
+        n = int(n_str)
+        if n < 0:
+            error = "n must be non-negative"
+        elif n <= 1:
+            result = {"n": n, "fibonacci": n}
+        else:
+            prev, curr = 0, 1
+            for _ in range(2, n + 1):
+                prev, curr = curr, prev + curr
+            result = {"n": n, "fibonacci": curr}
+    return render_template("fibonacci.html", result=result, error=error)
 ```
 
 ```{.html filename="templates/layout.html (updated nav)"}
@@ -993,43 +1018,98 @@ def fibonacci_api(n):
 <h1>Fibonacci Calculator</h1>
 <p>Enter a non-negative integer to calculate its Fibonacci number.</p>
 
-<form onsubmit="goToResult(event)">
+<form method="GET" action="/fibonacci">
     <label for="n">n:</label>
     <input type="number" id="n" name="n" min="0" required>
     <button type="submit">Calculate</button>
 </form>
 
-<div id="result"></div>
-
-<script>
-function goToResult(event) {
-    event.preventDefault();
-    const n = document.getElementById("n").value;
-    fetch("/fibonacci/" + n)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                document.getElementById("result").innerText = "Error: " + data.error;
-            } else {
-                document.getElementById("result").innerText =
-                    "fibonacci(" + data.n + ") = " + data.fibonacci;
-            }
-        });
-}
-</script>
+{% if error %}
+<p>Error: {{ error }}</p>
+{% elif result %}
+<p>fibonacci({{ result.n }}) = {{ result.fibonacci }}</p>
+{% endif %}
 {% endblock %}
 ```
 :::
 
-#### Comprehension Check: Why does the API route return JSON while the template route returns HTML?
+#### Question: How does `request.args` differ from URL parameters like `<int:n>`?
 
 ::: {.callout-note collapse="true"}
 ## Answer
 
-Flask handles return values differently based on type:
+Both read values from the URL, but in different ways:
 
-- When a route returns a **dict**, Flask automatically converts it to a JSON response with `Content-Type: application/json`
-- When a route calls `render_template(...)`, Flask returns an **HTML response** with `Content-Type: text/html`
+- `<int:n>` in the route pattern captures a **path segment** -- the value is part of the URL path itself: `/fibonacci/10`
+- `request.args.get("n")` reads a **query parameter** -- the value comes after `?` in the URL: `/fibonacci?n=10`
 
-Having two separate routes — one for JSON (`/fibonacci/<int:n>`) and one for HTML (`/fibonacci`) — is a common pattern. The HTML page can call the JSON API via JavaScript (as this exercise does with `fetch()`), keeping the logic in one place while supporting both browser users and programmatic API consumers.
+HTML forms with `method="GET"` append their inputs as query parameters, which is why `request.args` is the right tool here. Path parameters (like `<int:n>`) are better suited for identifying a specific resource, while query parameters are better for optional filtering or input.
+:::
+
+#### Extension: Show the Full Sequence
+
+Add a checkbox to the form that lets users chose to see the full sequence alongside the specific result.
+
+- Unchecked: `fibonacci(7) = 13`
+- Checked: `fibonacci(7) = 13` and `Sequence: 0, 1, 1, 2, 3, 5, 8, 13`
+
+Use a `show_sequence` query parameter (e.g. `/fibonacci?n=7&show_sequence=true`) to toggle this behavior.
+
+**Hints:**
+
+- Add a checkbox input with `name="show_sequence" value="true"` to the form. Browsers only include checked checkboxes in the query string.
+- In the route, read the `show_sequence` query parameter with `request.args.get("show_sequence")` and build the sequence list only when it's set.
+- Pass `sequence` to the template and conditionally render it.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+```{.python filename="flaskapp.py (fibonacci_page, updated)"}
+@app.route("/fibonacci")
+def fibonacci_page():
+    n_str = request.args.get("n")
+    result = None
+    sequence = None
+    error = None
+    if n_str is not None:
+        n = int(n_str)
+        if n < 0:
+            error = "n must be non-negative"
+        elif n <= 1:
+            result = {"n": n, "fibonacci": n}
+        else:
+            prev, curr = 0, 1
+            for _ in range(2, n + 1):
+                prev, curr = curr, prev + curr
+            result = {"n": n, "fibonacci": curr}
+
+        if result and request.args.get("show_sequence"):
+            seq = [0, 1] if n >= 1 else [0]
+            for _ in range(2, n + 1):
+                seq.append(seq[-1] + seq[-2])
+            sequence = seq
+
+    return render_template("fibonacci.html", result=result, sequence=sequence, error=error)
+```
+
+```{.html filename="templates/fibonacci.html (updated form and result block)"}
+<form method="GET" action="/fibonacci">
+    <label for="n">n:</label>
+    <input type="number" id="n" name="n" min="0" required>
+    <label>
+        <input type="checkbox" name="show_sequence" value="true">
+        Show full sequence
+    </label>
+    <button type="submit">Calculate</button>
+</form>
+
+{% if error %}
+<p>Error: {{ error }}</p>
+{% elif result %}
+<p>fibonacci({{ result.n }}) = {{ result.fibonacci }}</p>
+{% if sequence %}
+<p>Sequence: {{ sequence | join(", ") }}</p>
+{% endif %}
+{% endif %}
+```
 :::

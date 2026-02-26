@@ -2327,13 +2327,17 @@ vertical-align: -.125em;
 <li>Create routes that handle different URL patterns</li>
 <li>Pass data between Python backend and HTML templates</li>
 <li>Structure a multi-page application with template inheritance</li>
-<li><em>(Foundation for future labs)</em> Understand how to expose Python functions via HTTP endpoints</li>
+<li>Understand how to expose Python functions via HTTP endpoints (Foundation for future labs)</li>
 </ol>
-<p>Prerequisites: This lab uses Python classes and objects (e.g., <code>Flask(__name__)</code>). If you need a refresher on OOP, see the bootcamp materials.</p>
+<p>Prerequisites: This lab uses Python classes and objects (e.g., <code>Flask(__name__)</code>). If you’re not comfortable with the basics of object-oriented programming (OOP), see the <em>Programming Paradigms and Object-Oriented Programming (OOP) in Python</em> bootcamp materials:</p>
+<ul>
+<li><a href="https://github.com/Hertie-MDS-Bootcamps/winter-2026-python-bootcamp/blob/main/tutorials/python-objects.html">Tutorial</a></li>
+<li><a href="https://github.com/Hertie-MDS-Bootcamps/winter-2026-python-bootcamp/blob/main/exercises/python-objects.ipynb">Exercises</a></li>
+</ul>
 </section>
 <section id="why-web-development-in-a-data-structures-algorithms-course" class="level2">
 <h2 class="anchored" data-anchor-id="why-web-development-in-a-data-structures-algorithms-course">Why Web Development in a Data Structures &amp; Algorithms Course?</h2>
-<p>You might wonder why we’re learning the <strong>web framework Flask</strong> in a data structures and algorithms course. Reasons include:</p>
+<p>You might wonder why we’re learning the <strong>web framework</strong> <strong>Flask</strong> in a data structures and algorithms course. Reasons include:</p>
 <ul>
 <li><p>Practical Application: Many algorithms you’ll learn this semester (e.g. sorting, searching, graph traversal) need interfaces. Building a simple web app lets you visualize and interact with your algorithms.</p></li>
 <li><p>API Design: Later labs will have you build <strong>REST APIs</strong> that expose algorithmic functionality. Understanding Flask routing is essential for this.</p></li>
@@ -2356,13 +2360,13 @@ vertical-align: -.125em;
 <h1>What is flask and why should we use it? <a class="anchor" id="flask" href></a></h1>
 <section id="what-is-flask" class="level2">
 <h2 class="anchored" data-anchor-id="what-is-flask">What is Flask?</h2>
-<p>Flask is a <strong>microframework</strong> for building web applications in Python. It was created by Armin Ronacher in 2010 and has grown into one of the most widely used Python web frameworks (alongside Django).</p>
+<p><a href="https://flask.palletsprojects.com/en/stable/"><strong>Flask</strong></a> is a <strong>microframework</strong> for building web applications in Python. It was created by Armin Ronacher in 2010 and has grown into one of the most widely used Python web frameworks (alongside others like <a href="https://www.djangoproject.com/">Django</a>).</p>
 <p>Under the hood, Flask is built on two libraries that handle the hard parts for you:</p>
 <ul>
 <li><strong>Werkzeug</strong>: the <strong>WSGI</strong> toolkit that receives raw HTTP requests from the network and turns them into Python objects your code can work with.</li>
 <li><strong>Jinja2</strong>: the templating engine that lets you build HTML pages with dynamic Python data embedded in them (more on this in section 7).</li>
 </ul>
-<p>“Micro” means minimal by design, not underpowered or limited. Flask ships with just the essentials: routing, request handling, and templating. Unlike Django, it does not include a database layer, admin interface, or built-in authentication.</p>
+<p>“Micro” means minimal by design, not underpowered or limited. Flask ships with just the essentials: <strong>routing</strong>, <strong>request handling</strong>, and <strong>templating</strong>. Unlike Django, it does not include a database layer, admin interface, or built-in authentication.</p>
 <p>Flask is also <strong>“Pythonic”</strong>. Its design typically follows Python’s philosophy of readability, simplicity, and explicitness. You will recognise Python idioms, such as decorators, keyword arguments, and context managers, throughout Flask’s API. If you understand Python, Flask will feel natural.</p>
 <section id="how-flask-works-the-request-response-cycle" class="level3">
 <h3 class="anchored" data-anchor-id="how-flask-works-the-request-response-cycle">How Flask Works: The Request-Response Cycle</h3>
@@ -2430,7 +2434,7 @@ vertical-align: -.125em;
 <tr class="odd">
 <td><strong>Model</strong></td>
 <td>Data and business logic</td>
-<td>Your Python code: algorithms, data classes, database queries</td>
+<td>Your Python code: algorithms, (data) classes, database queries</td>
 </tr>
 <tr class="even">
 <td><strong>View</strong></td>
@@ -2497,11 +2501,11 @@ vertical-align: -.125em;
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="3" data-code-annotation="2">Creates your application object. The <code>__name__</code> argument tells Flask where this module lives so it can find resources like templates and static files <em>relative to this file</em>. When you run <code>flaskapp.py</code> directly, <code>__name__</code> equals <code>&quot;__main__&quot;</code>; when it is imported, <code>__name__</code> is <code>&quot;flaskapp&quot;</code>. Either way, Flask resolves file paths correctly.</span>
+<span data-code-cell="annotated-cell-3" data-code-lines="3" data-code-annotation="2">Creates your <strong>application object</strong>. The <code>__name__</code> argument tells Flask where this module lives so it can find resources like templates and static files <em>relative to this file</em>. When you run <code>flaskapp.py</code> directly, <code>__name__</code> equals <code>&quot;__main__&quot;</code>; when it is imported, <code>__name__</code> is <code>&quot;flaskapp&quot;</code>. Either way, Flask resolves file paths correctly.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="5" data-code-annotation="3">This is a <strong>decorator</strong> — a Python feature that wraps one function with another. Here, <code>app.route(&quot;/&quot;)</code> registers the decorated function in Flask’s routing table: “when someone visits <code>/</code>, call <code>home()</code>.” Decorators always appear directly above the function they modify, prefixed with <code>@</code>.</span>
+<span data-code-cell="annotated-cell-3" data-code-lines="5" data-code-annotation="3">This is a <strong>decorator</strong>: a Python feature that wraps one function with another. Here, <code>app.route(&quot;/&quot;)</code> registers the decorated function in Flask’s <strong>routing table</strong>. For example, when someone visits <code>/</code>, call <code>home()</code>. Decorators always appear directly above the function they modify, prefixed with <code>@</code>.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="4">4</dt>
 <dd>
@@ -2509,7 +2513,7 @@ vertical-align: -.125em;
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="5">5</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="7" data-code-annotation="5">The return value becomes the HTTP response body. You can return plain text, HTML strings, or (later) rendered templates.</span>
+<span data-code-cell="annotated-cell-3" data-code-lines="7" data-code-annotation="5">The return value becomes the <strong>HTTP response body</strong>. You can return plain text, HTML strings, or (later) rendered templates.</span>
 </dd>
 </dl>
 <p>Note: Do not name it <code>flask.py</code>, as that would overlap with the Flask package itself and cause an import error.</p>
@@ -2598,7 +2602,7 @@ vertical-align: -.125em;
 </div>
 <p>Then:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python flaskapp.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The <code>if __name__ == &#39;__main__&#39;:</code> ensures that <code>app.run()</code> is only called when you run the script directly, not when Flask imports it as a module.</p>
+<p>The <code>if __name__ == &#39;__main__&#39;:</code> idiom ensures that <code>app.run()</code> is only called when you run the script directly, not when Flask imports it as a module. This is the same idea as using said idiom for (command line interface) scripts.</p>
 </section>
 </section>
 <section id="create-new-pages-with-routing" class="level2">
@@ -2705,17 +2709,13 @@ vertical-align: -.125em;
 </section>
 <section id="url-encoding" class="level3">
 <h3 class="anchored" data-anchor-id="url-encoding">URL encoding</h3>
-<p>Spaces and special characters are not allowed in URLs. The browser automatically encodes them:</p>
-<ul>
-<li>space becomes <code>%20</code></li>
-<li><code>/hello/New York</code> becomes <code>/hello/New%20York</code></li>
-</ul>
+<p>Spaces and special characters are not allowed in URLs. The browser automatically encodes them. For example, space is replaced by <code>%20</code>, so <code>/hello/New York</code> becomes <code>/hello/New%20York</code>. Think of escaping characters with a backslash.</p>
 <p>Flask decodes <code>%20</code> back to a space before passing the value to your function, so <code>city</code> will equal <code>&quot;New York&quot;</code> (with a space) in Python.</p>
 </section>
 </section>
 <section id="add-more-content-using-templates" class="level2">
 <h2 class="anchored" data-anchor-id="add-more-content-using-templates">7. Add more content using templates <a class="anchor" id="templates" href></a></h2>
-<p>Embedding HTML directly in Python return statements works for trivial pages, but it scales poorly. Flask solves this with <strong>templates</strong>, which separate HTML files that can contain placeholders for <strong>dynamic content</strong>.</p>
+<p>Embedding HTML directly in Python return statements works for trivial pages, but it scales poorly. Flask solves this with <strong>templates</strong>, which are HTML files that can contain placeholders for <strong>dynamic content</strong>.</p>
 <p>The template engine Flask uses is called <strong>Jinja2</strong> (the same engine used by many other tools). You write HTML as normal and include <code>{ variable }</code> placeholders and <code>{% control flow %}</code> blocks wherever you need Python data.</p>
 <section id="setting-up-the-template-directory" class="level3">
 <h3 class="anchored" data-anchor-id="setting-up-the-template-directory">Setting up the template directory</h3>
@@ -3001,8 +3001,8 @@ vertical-align: -.125em;
 <li><label><input type="checkbox">Created a <code>templates/</code> directory with <code>home.html</code></label></li>
 <li><label><input type="checkbox">Used <code>render_template()</code> to serve the template</label></li>
 </ul>
-<section id="comprehension-check-why-do-we-use-render_template-instead-of-returning-html-strings-directly" class="level4">
-<h4 class="anchored" data-anchor-id="comprehension-check-why-do-we-use-render_template-instead-of-returning-html-strings-directly">Comprehension Check: Why do we use <code>render_template()</code> instead of returning HTML strings directly?</h4>
+<section id="question-why-do-we-use-render_template-instead-of-returning-html-strings-directly" class="level4">
+<h4 class="anchored" data-anchor-id="question-why-do-we-use-render_template-instead-of-returning-html-strings-directly">Question: Why do we use <code>render_template()</code> instead of returning HTML strings directly?</h4>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -3017,10 +3017,10 @@ vertical-align: -.125em;
 <div class="callout-body-container callout-body">
 <p>Using <code>render_template()</code> separates presentation (HTML) from logic (Python), making code:</p>
 <ol type="1">
-<li>More maintainable - HTML changes don’t require Python changes</li>
-<li>More reusable - Templates can be shared across routes</li>
-<li>More powerful - Jinja2 provides loops, conditionals, inheritance</li>
-<li>Cleaner - No messy string concatenation in Python</li>
+<li>More maintainable: HTML changes don’t require Python changes</li>
+<li>More reusable: Templates can be shared across routes</li>
+<li>More powerful: Jinja2 provides loops, conditionals, inheritance</li>
+<li>Cleaner: No messy string concatenation in Python</li>
 </ol>
 </div>
 </div>
@@ -3175,8 +3175,8 @@ vertical-align: -.125em;
 <section id="exercise-5-navigation-bar-with-template-inheritance" class="level3">
 <h3 class="anchored" data-anchor-id="exercise-5-navigation-bar-with-template-inheritance">Exercise 5: Navigation Bar with Template Inheritance</h3>
 <p>This exercise introduces <strong>template inheritance</strong>, a powerful Flask/Jinja2 feature for avoiding code duplication.</p>
-<section id="step-5.1-understand-the-problem" class="level4">
-<h4 class="anchored" data-anchor-id="step-5.1-understand-the-problem">Step 5.1: Understand the Problem</h4>
+<section id="step-5.1-understand-the-problem-inheritance-solves" class="level4">
+<h4 class="anchored" data-anchor-id="step-5.1-understand-the-problem-inheritance-solves">Step 5.1: Understand the Problem Inheritance Solves</h4>
 <p>Currently, if you want a navigation bar on every page, you’d have to copy the HTML to each template. What if you have 10 pages? 100? Template inheritance solves this.</p>
 </section>
 <section id="step-5.2-create-the-base-layout" class="level4">
@@ -3323,8 +3323,8 @@ vertical-align: -.125em;
 </div>
 </div>
 </section>
-<section id="comprehension-check-whats-the-advantage-of-template-inheritance-over-copy-pasting" class="level4">
-<h4 class="anchored" data-anchor-id="comprehension-check-whats-the-advantage-of-template-inheritance-over-copy-pasting">Comprehension Check: What’s the advantage of template inheritance over copy-pasting?</h4>
+<section id="question-whats-the-advantage-of-template-inheritance-over-copy-pasting" class="level4">
+<h4 class="anchored" data-anchor-id="question-whats-the-advantage-of-template-inheritance-over-copy-pasting">Question: What’s the advantage of template inheritance over copy-pasting?</h4>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -3337,12 +3337,12 @@ vertical-align: -.125em;
 </div>
 <div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Template inheritance follows the DRY (Don’t Repeat Yourself) principle:</p>
+<p>Template inheritance follows the <strong>DRY (Don’t Repeat Yourself)</strong> principle:</p>
 <ol type="1">
-<li>Single source of truth - Change the nav once, it updates everywhere</li>
-<li>Consistency - All pages automatically share the same structure</li>
-<li>Maintainability - Fixing a bug in the layout fixes it for all pages</li>
-<li>Scalability - Adding 100 pages doesn’t mean copying 100 nav bars</li>
+<li><strong>Single source of truth</strong>: Change the nav once, it updates everywhere</li>
+<li>Consistency: All pages automatically share the same structure</li>
+<li>Maintainability: Fixing a bug in the layout fixes it for all pages</li>
+<li>Scalability: Adding 100 pages doesn’t mean copying 100 nav bars</li>
 </ol>
 </div>
 </div>
@@ -3351,7 +3351,8 @@ vertical-align: -.125em;
 </section>
 <section id="exercise-6-fibonacci-calculator-page" class="level3">
 <h3 class="anchored" data-anchor-id="exercise-6-fibonacci-calculator-page">Exercise 6: Fibonacci Calculator Page</h3>
-<p>Build a Fibonacci Calculator page that connects the <code>fibonacci_api</code> route from the preview section to an HTML interface. This exercise combines everything from the lab: routes, URL parameters, templates, and template inheritance.</p>
+<p>Build a Fibonacci Calculator page that lets users enter a number and see the result.</p>
+<p>This exercise combines routes, query parameters, templates, and template inheritance.</p>
 <section id="step-6.1-add-the-api-route" class="level4">
 <h4 class="anchored" data-anchor-id="step-6.1-add-the-api-route">Step 6.1: Add the API Route</h4>
 <p>Make sure your <code>flaskapp.py</code> includes the Fibonacci API route from the preview section:</p>
@@ -3376,21 +3377,38 @@ vertical-align: -.125em;
 </div>
 <p>Visit <code>http://localhost:5000/fibonacci/10</code> to confirm it returns JSON like <code>{&quot;fibonacci&quot;: 55, &quot;n&quot;: 10}</code>.</p>
 </section>
-<section id="step-6.2-add-a-landing-page-route" class="level4">
-<h4 class="anchored" data-anchor-id="step-6.2-add-a-landing-page-route">Step 6.2: Add a Landing Page Route</h4>
-<p>The API route returns JSON, but we need a separate route that renders an HTML form. Add this to <code>flaskapp.py</code>:</p>
+<section id="step-6.2-add-a-page-route" class="level4">
+<h4 class="anchored" data-anchor-id="step-6.2-add-a-page-route">Step 6.2: Add a Page Route</h4>
+<p>The API route above returns JSON. To display a proper HTML page, add a separate route that reads <code>n</code> from the <strong>URL query string</strong> (<code>?n=10</code>), computes the result server-side, and passes it to the template.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>flaskapp.py</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38" data-filename="flaskapp.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&quot;/fibonacci&quot;</span>)</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fibonacci_page():</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&quot;fibonacci.html&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38" data-filename="flaskapp.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> request</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&quot;/fibonacci&quot;</span>)</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fibonacci_page():</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    n_str <span class="op">=</span> request.args.get(<span class="st">&quot;n&quot;</span>)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>    error <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n_str <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>        n <span class="op">=</span> <span class="bu">int</span>(n_str)</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> n <span class="op">&lt;</span> <span class="dv">0</span>:</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>            error <span class="op">=</span> <span class="st">&quot;n must be non-negative&quot;</span></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> n <span class="op">&lt;=</span> <span class="dv">1</span>:</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> {<span class="st">&quot;n&quot;</span>: n, <span class="st">&quot;fibonacci&quot;</span>: n}</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>            prev, curr <span class="op">=</span> <span class="dv">0</span>, <span class="dv">1</span></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>, n <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>                prev, curr <span class="op">=</span> curr, prev <span class="op">+</span> curr</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> {<span class="st">&quot;n&quot;</span>: n, <span class="st">&quot;fibonacci&quot;</span>: curr}</span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&quot;fibonacci.html&quot;</span>, result<span class="op">=</span>result, error<span class="op">=</span>error)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p><code>request.args</code> is a dictionary-like object Flask populates from <strong>URL query parameters</strong>. When the form submits, the browser navigates to <code>/fibonacci?n=10</code> and Flask reads <code>n</code> from that URL. If you haven’t noticed before, the <code>?</code> suffix is frequently used in URLs for this purpose.</p>
 </section>
 <section id="step-6.3-create-the-template" class="level4">
 <h4 class="anchored" data-anchor-id="step-6.3-create-the-template">Step 6.3: Create the Template</h4>
-<p>Create <code>templates/fibonacci.html</code>. The form submits to the API route using a GET request, but since the API expects the number in the URL (not as a query parameter), we’ll use a small JavaScript redirect:</p>
+<p>Create <code>templates/fibonacci.html</code>. The form uses <code>method=&quot;GET&quot;</code> so the input to the form becomes a query parameter, and Jinja2 conditionally renders the result.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>templates/fibonacci.html</strong></pre>
@@ -3403,40 +3421,28 @@ vertical-align: -.125em;
 <span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Fibonacci Calculator<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
 <span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>Enter a non-negative integer to calculate its Fibonacci number.<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
 <span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> onsubmit</span><span class="op">=</span><span class="st">&quot;goToResult(event)&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> method</span><span class="op">=</span><span class="st">&quot;GET&quot;</span><span class="ot"> action</span><span class="op">=</span><span class="st">&quot;/fibonacci&quot;</span><span class="dt">&gt;</span></span>
 <span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">label</span><span class="ot"> for</span><span class="op">=</span><span class="st">&quot;n&quot;</span><span class="dt">&gt;</span>n:<span class="dt">&lt;/</span><span class="kw">label</span><span class="dt">&gt;</span></span>
 <span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;number&quot;</span><span class="ot"> id</span><span class="op">=</span><span class="st">&quot;n&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;n&quot;</span><span class="ot"> min</span><span class="op">=</span><span class="st">&quot;0&quot;</span><span class="ot"> required</span><span class="dt">&gt;</span></span>
 <span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">button</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;submit&quot;</span><span class="dt">&gt;</span>Calculate<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span>
 <span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span>
 <span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> id</span><span class="op">=</span><span class="st">&quot;result&quot;</span><span class="dt">&gt;&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
-<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">script</span><span class="dt">&gt;</span></span>
-<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">goToResult</span>(<span class="bu">event</span>) {</span>
-<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">event</span><span class="op">.</span><span class="fu">preventDefault</span>()<span class="op">;</span></span>
-<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> n <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;n&quot;</span>)<span class="op">.</span><span class="at">value</span><span class="op">;</span></span>
-<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fetch</span>(<span class="st">&quot;/fibonacci/&quot;</span> <span class="op">+</span> n)</span>
-<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span><span class="fu">then</span>(response <span class="kw">=&gt;</span> response<span class="op">.</span><span class="fu">json</span>())</span>
-<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span><span class="fu">then</span>(data <span class="kw">=&gt;</span> {</span>
-<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (data<span class="op">.</span><span class="at">error</span>) {</span>
-<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a>                <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;result&quot;</span>)<span class="op">.</span><span class="at">innerText</span> <span class="op">=</span> <span class="st">&quot;Error: &quot;</span> <span class="op">+</span> data<span class="op">.</span><span class="at">error</span><span class="op">;</span></span>
-<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a>            } <span class="cf">else</span> {</span>
-<span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a>                <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;result&quot;</span>)<span class="op">.</span><span class="at">innerText</span> <span class="op">=</span></span>
-<span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;fibonacci(&quot;</span> <span class="op">+</span> data<span class="op">.</span><span class="at">n</span> <span class="op">+</span> <span class="st">&quot;) = &quot;</span> <span class="op">+</span> data<span class="op">.</span><span class="at">fibonacci</span><span class="op">;</span></span>
-<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a>            }</span>
-<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a>        })<span class="op">;</span></span>
-<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span>
-<span id="cb39-33"><a href="#cb39-33" aria-hidden="true" tabindex="-1"></a>{% endblock %}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>{% if error %}</span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>Error: {{ error }}<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>{% elif result %}</span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>fibonacci({{ result.n }}) = {{ result.fibonacci }}<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>{% endif %}</span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>{% endblock %}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>When the form is submitted, the browser navigates to <code>/fibonacci?n=10</code>. Flask handles it server-side (i.e. computes it with Python) and re-renders the page with the result embedded in the HTML.</p>
 </section>
 <section id="step-6.4-your-task" class="level4">
 <h4 class="anchored" data-anchor-id="step-6.4-your-task">Step 6.4: Your Task</h4>
 <ol type="1">
-<li>Add the <code>fibonacci_page</code> route to <code>flaskapp.py</code></li>
+<li>Add the <code>fibonacci_page</code> route to <code>flaskapp.py</code> (Hint: don’t forget <code>from flask import request</code>)</li>
 <li>Create <code>templates/fibonacci.html</code> extending <code>layout.html</code></li>
 <li>Add a “Fibonacci” link to the nav in <code>layout.html</code></li>
-<li>Test it: visit <code>http://localhost:5000/fibonacci</code>, enter a number, and verify the result</li>
+<li>Test it by visiting <code>http://localhost:5000/fibonacci</code>, entering a number, and verifying the result.</li>
 </ol>
 </section>
 <section id="full-solution-2" class="level4">
@@ -3457,20 +3463,36 @@ vertical-align: -.125em;
 <div class="code-with-filename-file">
 <pre><strong>flaskapp.py (additions)</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40" data-filename="flaskapp.py (additions)"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&quot;/fibonacci&quot;</span>)</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fibonacci_page():</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&quot;fibonacci.html&quot;</span>)</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&quot;/fibonacci/&lt;int:n&gt;&quot;</span>)</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fibonacci_api(n):</span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">&lt;</span> <span class="dv">0</span>:</span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {<span class="st">&quot;error&quot;</span>: <span class="st">&quot;n must be non-negative&quot;</span>}, <span class="dv">400</span></span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">&lt;=</span> <span class="dv">1</span>:</span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {<span class="st">&quot;n&quot;</span>: n, <span class="st">&quot;fibonacci&quot;</span>: n}</span>
-<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>    prev, curr <span class="op">=</span> <span class="dv">0</span>, <span class="dv">1</span></span>
-<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>, n <span class="op">+</span> <span class="dv">1</span>):</span>
-<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>        prev, curr <span class="op">=</span> curr, prev <span class="op">+</span> curr</span>
-<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;n&quot;</span>: n, <span class="st">&quot;fibonacci&quot;</span>: curr}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40" data-filename="flaskapp.py (additions)"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> request</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&quot;/fibonacci/&lt;int:n&gt;&quot;</span>)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fibonacci_api(n):</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">&lt;</span> <span class="dv">0</span>:</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {<span class="st">&quot;error&quot;</span>: <span class="st">&quot;n must be non-negative&quot;</span>}, <span class="dv">400</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">&lt;=</span> <span class="dv">1</span>:</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {<span class="st">&quot;n&quot;</span>: n, <span class="st">&quot;fibonacci&quot;</span>: n}</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>    prev, curr <span class="op">=</span> <span class="dv">0</span>, <span class="dv">1</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>, n <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>        prev, curr <span class="op">=</span> curr, prev <span class="op">+</span> curr</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;n&quot;</span>: n, <span class="st">&quot;fibonacci&quot;</span>: curr}</span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&quot;/fibonacci&quot;</span>)</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fibonacci_page():</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>    n_str <span class="op">=</span> request.args.get(<span class="st">&quot;n&quot;</span>)</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>    error <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n_str <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>        n <span class="op">=</span> <span class="bu">int</span>(n_str)</span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> n <span class="op">&lt;</span> <span class="dv">0</span>:</span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>            error <span class="op">=</span> <span class="st">&quot;n must be non-negative&quot;</span></span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> n <span class="op">&lt;=</span> <span class="dv">1</span>:</span>
+<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> {<span class="st">&quot;n&quot;</span>: n, <span class="st">&quot;fibonacci&quot;</span>: n}</span>
+<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a>            prev, curr <span class="op">=</span> <span class="dv">0</span>, <span class="dv">1</span></span>
+<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>, n <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb40-28"><a href="#cb40-28" aria-hidden="true" tabindex="-1"></a>                prev, curr <span class="op">=</span> curr, prev <span class="op">+</span> curr</span>
+<span id="cb40-29"><a href="#cb40-29" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> {<span class="st">&quot;n&quot;</span>: n, <span class="st">&quot;fibonacci&quot;</span>: curr}</span>
+<span id="cb40-30"><a href="#cb40-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&quot;fibonacci.html&quot;</span>, result<span class="op">=</span>result, error<span class="op">=</span>error)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
@@ -3494,38 +3516,25 @@ vertical-align: -.125em;
 <span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Fibonacci Calculator<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
 <span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>Enter a non-negative integer to calculate its Fibonacci number.<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
 <span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> onsubmit</span><span class="op">=</span><span class="st">&quot;goToResult(event)&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> method</span><span class="op">=</span><span class="st">&quot;GET&quot;</span><span class="ot"> action</span><span class="op">=</span><span class="st">&quot;/fibonacci&quot;</span><span class="dt">&gt;</span></span>
 <span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">label</span><span class="ot"> for</span><span class="op">=</span><span class="st">&quot;n&quot;</span><span class="dt">&gt;</span>n:<span class="dt">&lt;/</span><span class="kw">label</span><span class="dt">&gt;</span></span>
 <span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;number&quot;</span><span class="ot"> id</span><span class="op">=</span><span class="st">&quot;n&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;n&quot;</span><span class="ot"> min</span><span class="op">=</span><span class="st">&quot;0&quot;</span><span class="ot"> required</span><span class="dt">&gt;</span></span>
 <span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">button</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;submit&quot;</span><span class="dt">&gt;</span>Calculate<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span>
 <span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span>
 <span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> id</span><span class="op">=</span><span class="st">&quot;result&quot;</span><span class="dt">&gt;&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
-<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">script</span><span class="dt">&gt;</span></span>
-<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">goToResult</span>(<span class="bu">event</span>) {</span>
-<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">event</span><span class="op">.</span><span class="fu">preventDefault</span>()<span class="op">;</span></span>
-<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> n <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;n&quot;</span>)<span class="op">.</span><span class="at">value</span><span class="op">;</span></span>
-<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fetch</span>(<span class="st">&quot;/fibonacci/&quot;</span> <span class="op">+</span> n)</span>
-<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span><span class="fu">then</span>(response <span class="kw">=&gt;</span> response<span class="op">.</span><span class="fu">json</span>())</span>
-<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span><span class="fu">then</span>(data <span class="kw">=&gt;</span> {</span>
-<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (data<span class="op">.</span><span class="at">error</span>) {</span>
-<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>                <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;result&quot;</span>)<span class="op">.</span><span class="at">innerText</span> <span class="op">=</span> <span class="st">&quot;Error: &quot;</span> <span class="op">+</span> data<span class="op">.</span><span class="at">error</span><span class="op">;</span></span>
-<span id="cb42-26"><a href="#cb42-26" aria-hidden="true" tabindex="-1"></a>            } <span class="cf">else</span> {</span>
-<span id="cb42-27"><a href="#cb42-27" aria-hidden="true" tabindex="-1"></a>                <span class="bu">document</span><span class="op">.</span><span class="fu">getElementById</span>(<span class="st">&quot;result&quot;</span>)<span class="op">.</span><span class="at">innerText</span> <span class="op">=</span></span>
-<span id="cb42-28"><a href="#cb42-28" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&quot;fibonacci(&quot;</span> <span class="op">+</span> data<span class="op">.</span><span class="at">n</span> <span class="op">+</span> <span class="st">&quot;) = &quot;</span> <span class="op">+</span> data<span class="op">.</span><span class="at">fibonacci</span><span class="op">;</span></span>
-<span id="cb42-29"><a href="#cb42-29" aria-hidden="true" tabindex="-1"></a>            }</span>
-<span id="cb42-30"><a href="#cb42-30" aria-hidden="true" tabindex="-1"></a>        })<span class="op">;</span></span>
-<span id="cb42-31"><a href="#cb42-31" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb42-32"><a href="#cb42-32" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span>
-<span id="cb42-33"><a href="#cb42-33" aria-hidden="true" tabindex="-1"></a>{% endblock %}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>{% if error %}</span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>Error: {{ error }}<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>{% elif result %}</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>fibonacci({{ result.n }}) = {{ result.fibonacci }}<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>{% endif %}</span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>{% endblock %}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="comprehension-check-why-does-the-api-route-return-json-while-the-template-route-returns-html" class="level4">
-<h4 class="anchored" data-anchor-id="comprehension-check-why-does-the-api-route-return-json-while-the-template-route-returns-html">Comprehension Check: Why does the API route return JSON while the template route returns HTML?</h4>
+<section id="question-how-does-request.args-differ-from-url-parameters-like-intn" class="level4">
+<h4 class="anchored" data-anchor-id="question-how-does-request.args-differ-from-url-parameters-like-intn">Question: How does <code>request.args</code> differ from URL parameters like <code>&lt;int:n&gt;</code>?</h4>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -3538,12 +3547,95 @@ vertical-align: -.125em;
 </div>
 <div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Flask handles return values differently based on type:</p>
+<p>Both read values from the URL, but in different ways:</p>
 <ul>
-<li>When a route returns a <strong>dict</strong>, Flask automatically converts it to a JSON response with <code>Content-Type: application/json</code></li>
-<li>When a route calls <code>render_template(...)</code>, Flask returns an <strong>HTML response</strong> with <code>Content-Type: text/html</code></li>
+<li><code>&lt;int:n&gt;</code> in the route pattern captures a <strong>path segment</strong> – the value is part of the URL path itself: <code>/fibonacci/10</code></li>
+<li><code>request.args.get(&quot;n&quot;)</code> reads a <strong>query parameter</strong> – the value comes after <code>?</code> in the URL: <code>/fibonacci?n=10</code></li>
 </ul>
-<p>Having two separate routes — one for JSON (<code>/fibonacci/&lt;int:n&gt;</code>) and one for HTML (<code>/fibonacci</code>) — is a common pattern. The HTML page can call the JSON API via JavaScript (as this exercise does with <code>fetch()</code>), keeping the logic in one place while supporting both browser users and programmatic API consumers.</p>
+<p>HTML forms with <code>method=&quot;GET&quot;</code> append their inputs as query parameters, which is why <code>request.args</code> is the right tool here. Path parameters (like <code>&lt;int:n&gt;</code>) are better suited for identifying a specific resource, while query parameters are better for optional filtering or input.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="extension-show-the-full-sequence" class="level4">
+<h4 class="anchored" data-anchor-id="extension-show-the-full-sequence">Extension: Show the Full Sequence</h4>
+<p>Add a checkbox to the form that lets users chose to see the full sequence alongside the specific result.</p>
+<ul>
+<li>Unchecked: <code>fibonacci(7) = 13</code></li>
+<li>Checked: <code>fibonacci(7) = 13</code> and <code>Sequence: 0, 1, 1, 2, 3, 5, 8, 13</code></li>
+</ul>
+<p>Use a <code>show_sequence</code> query parameter (e.g. <code>/fibonacci?n=7&amp;show_sequence=true</code>) to toggle this behavior.</p>
+<p><strong>Hints:</strong></p>
+<ul>
+<li>Add a checkbox input with <code>name=&quot;show_sequence&quot; value=&quot;true&quot;</code> to the form. Browsers only include checked checkboxes in the query string.</li>
+<li>In the route, read the <code>show_sequence</code> query parameter with <code>request.args.get(&quot;show_sequence&quot;)</code> and build the sequence list only when it’s set.</li>
+<li>Pass <code>sequence</code> to the template and conditionally render it.</li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Solution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>flaskapp.py (fibonacci_page, updated)</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb43" data-filename="flaskapp.py (fibonacci_page, updated)"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&quot;/fibonacci&quot;</span>)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fibonacci_page():</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    n_str <span class="op">=</span> request.args.get(<span class="st">&quot;n&quot;</span>)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    sequence <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    error <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n_str <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>        n <span class="op">=</span> <span class="bu">int</span>(n_str)</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> n <span class="op">&lt;</span> <span class="dv">0</span>:</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>            error <span class="op">=</span> <span class="st">&quot;n must be non-negative&quot;</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> n <span class="op">&lt;=</span> <span class="dv">1</span>:</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> {<span class="st">&quot;n&quot;</span>: n, <span class="st">&quot;fibonacci&quot;</span>: n}</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>            prev, curr <span class="op">=</span> <span class="dv">0</span>, <span class="dv">1</span></span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>, n <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>                prev, curr <span class="op">=</span> curr, prev <span class="op">+</span> curr</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> {<span class="st">&quot;n&quot;</span>: n, <span class="st">&quot;fibonacci&quot;</span>: curr}</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> result <span class="kw">and</span> request.args.get(<span class="st">&quot;show_sequence&quot;</span>):</span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>            seq <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">1</span>] <span class="cf">if</span> n <span class="op">&gt;=</span> <span class="dv">1</span> <span class="cf">else</span> [<span class="dv">0</span>]</span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>, n <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>                seq.append(seq[<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> seq[<span class="op">-</span><span class="dv">2</span>])</span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>            sequence <span class="op">=</span> seq</span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&quot;fibonacci.html&quot;</span>, result<span class="op">=</span>result, sequence<span class="op">=</span>sequence, error<span class="op">=</span>error)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>templates/fibonacci.html (updated form and result block)</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb44" data-filename="templates/fibonacci.html (updated form and result block)"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> method</span><span class="op">=</span><span class="st">&quot;GET&quot;</span><span class="ot"> action</span><span class="op">=</span><span class="st">&quot;/fibonacci&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">label</span><span class="ot"> for</span><span class="op">=</span><span class="st">&quot;n&quot;</span><span class="dt">&gt;</span>n:<span class="dt">&lt;/</span><span class="kw">label</span><span class="dt">&gt;</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;number&quot;</span><span class="ot"> id</span><span class="op">=</span><span class="st">&quot;n&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;n&quot;</span><span class="ot"> min</span><span class="op">=</span><span class="st">&quot;0&quot;</span><span class="ot"> required</span><span class="dt">&gt;</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">label</span><span class="dt">&gt;</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;checkbox&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;show_sequence&quot;</span><span class="ot"> value</span><span class="op">=</span><span class="st">&quot;true&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>        Show full sequence</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">label</span><span class="dt">&gt;</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">button</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;submit&quot;</span><span class="dt">&gt;</span>Calculate<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>{% if error %}</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>Error: {{ error }}<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>{% elif result %}</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>fibonacci({{ result.n }}) = {{ result.fibonacci }}<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>{% if sequence %}</span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>Sequence: {{ sequence | join(&quot;, &quot;) }}<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>{% endif %}</span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>{% endif %}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </div>
 </div>
 </div>
