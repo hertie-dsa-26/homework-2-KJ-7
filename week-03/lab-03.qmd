@@ -133,7 +133,7 @@ Keeping these three layers separate pays off as your apps grow in size and compl
 
 # Create your first flask app <a class="anchor" id="first"></a>
 
-## 1. Create a `uv` project and install Flask <a class="anchor" id="install"></a>
+## Part 1: Create a `uv` project and install Flask <a class="anchor" id="install"></a>
 
 This course uses `uv` for package management Wherever the Flask documentation or other tutorials say `flask run`, prefix it with `uv run` so that Flask runs inside the `uv` managed environment. We'll start by creating a dedicated directory for your Flask app and initialising a new `uv` project inside it. From inside the `week-03/` directory, run:
 
@@ -158,7 +158,7 @@ This single command:
 3. Creates (or updates) a `uv.lock` file pinning exact versions
 4. Installs everything into a local `.venv` (no manual activation required)
 
-## 2. Set-up your Flask app <a class="anchor" id="setup"></a>
+## Part 2: Set-up your Flask app <a class="anchor" id="setup"></a>
 
 Create a new Python file called `flaskapp.py` inside `my_flask_app/` containing:
 
@@ -180,7 +180,7 @@ def home():               # <4>
 
 Note: Do not name it `flask.py`, as that would overlap with the Flask package itself and cause an import error.
 
-## 3. Run your Flask app <a class="anchor" id="run"></a>
+## Part 3: Run your Flask app <a class="anchor" id="run"></a>
 
 From inside `my_flask_app/`, start the development server:
 
@@ -225,7 +225,7 @@ Flask starts a WSGI development server (Werkzeug) that:
 
 You can stop the server by pressing press Ctrl+C in the terminal.
 
-## 4. Make some first changes to your app <a class="anchor" id="changes"></a>
+## Part 4: Make some first changes to your app <a class="anchor" id="changes"></a>
 
 ### Adding HTML to the response
 
@@ -288,7 +288,7 @@ uv run python flaskapp.py
 
 The `if __name__ == '__main__':` idiom ensures that `app.run()` is only called when you run the script directly, not when Flask imports it as a module. This is the same idea as using said idiom for (command line interface) scripts.
 
-## 5. Create new pages with routing <a class="anchor" id="newpages"></a>
+## Part 5: Create new pages with routing <a class="anchor" id="newpages"></a>
 
 **Routing** is the process of matching an incoming URL to the right Python function. Each `@app.route(...)` call registers one mapping in Flask's routing table.
 
@@ -333,7 +333,7 @@ Flask will call `home()` for either URL.
 
 Every view function name must be unique. If you define two functions both called `home`, Python will silently overwrite the first one and Flask will only register the second. Use distinct names like `home`, `about`, `hello`, etc.
 
-## 6. Pass variables through the URL <a class="anchor" id="variables"></a>
+## Part 6: Pass variables through the URL <a class="anchor" id="variables"></a>
 
 Static routes like `/hello` always return the same page. **URL variables** let you pass data to the view function directly in the URL path, making pages **dynamic**.
 
@@ -374,7 +374,7 @@ Spaces and special characters are not allowed in URLs. The browser automatically
 
 Flask decodes `%20` back to a space before passing the value to your function, so `city` will equal `"New York"` (with a space) in Python.
 
-## 7. Add more content using templates <a class="anchor" id="templates"></a>
+## Part 7: Add more content using templates <a class="anchor" id="templates"></a>
 
 Embedding HTML directly in Python return statements works for trivial pages, but it scales poorly. Flask solves this with **templates**, which are HTML files that can contain placeholders for **dynamic content**.
 
@@ -440,7 +440,7 @@ def home():
 2. Process any Jinja2 placeholders.
 3. Return the resulting HTML string as the response body.
 
-## 8. Passing variables from Python to the template
+## Part 8: Passing variables from Python to the template
 
 You can pass any Python data into a template by providing keyword arguments to `render_template`. Jinja2 makes those values available inside the HTML.
 
@@ -512,7 +512,7 @@ def home():
 
 This renders a `<ul>` with one `<li>` per item in the list, which is exactly how you will display algorithm output in later exercises.
 
-## 9. Some very basic HTML and CSS  <a class="anchor" id="html"></a>
+## Part 9: Some very basic HTML and CSS  <a class="anchor" id="html"></a>
 
 Now let's add some very basic styling to the home page by adapting the HTML code and adding some CSS
 
