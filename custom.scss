@@ -81,6 +81,8 @@ pre.bash {
 div.code-with-filename:has(+ dl.code-annotation-container-grid) {
   div.sourceCode {
     margin-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
 
   pre.sourceCode {
@@ -106,6 +108,7 @@ pre.sourceCode code a.code-annotation-anchor {
 dl.code-annotation-container-grid {
   background-color: $code-block-bg;
   margin-top: 0;
+  border-top: 1px solid $output-color;
   padding: 0.5em 1em;
   border-radius: 0 0 0.375em 0.375em;
   color: $output-color;
@@ -119,4 +122,31 @@ dl.code-annotation-container-grid {
   dd {
     color: $output-color;
   }
+}
+
+/* Code-with-filename header ------------------------------------------------ */
+
+.code-with-filename .code-with-filename-file {
+  background-color: $code-block-bg;
+  padding: 0.5em 1em;
+  border-radius: 0.375em 0.375em 0 0;
+  border-bottom: 1px solid $output-color;
+
+  pre {
+    margin: 0;
+    padding: 0;
+    background-color: $code-block-bg;
+    border: none;
+
+    strong {
+      color: $output-color;
+      font-weight: bold;
+    }
+  }
+}
+
+.code-with-filename div.sourceCode,
+.code-with-filename pre.sourceCode {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
