@@ -552,3 +552,278 @@ return render_template('index.html', printed_result=str(round(result, 3)))
 
 This rounds the result to 3 decimal places before displaying it.
 :::
+
+### Exercise 8
+
+Add a **calculation history** page to your app.
+
+- Add a module-level list `history = []` in `flask_app.py`. After each successful calculation in `calculate()`, append a string describing the operation and result (e.g. `"3.0 add 4.0 = 7.0"`) to this list.
+- Add a new `/history` route that renders a `history.html` template. The template should display the history as an unordered list using a Jinja2 `{% for %}` loop, and show a message like "No calculations yet." when the list is empty (`{% if %}` / `{% else %}`).
+- Add a link in `index.html` to the history page using `url_for`.
+
+After building this, consider: what happens to the history if you restart the Flask server? Why?
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+```{.python filename="flask_app.py"}
+from flask import Flask, render_template, request
+from helper import perform_calculation, convert_to_float
+
+app = Flask(__name__)
+
+history = []  # in-memory list; cleared on server restart
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    value1 = request.form['value1']
+    value2 = request.form['value2']
+    operation = str(request.form['operation'])
+
+    if operation not in ['add', 'subtract', 'divide', 'multiply']:
+        return render_template('index.html',
+                               printed_result='Invalid operation.')
+    try:
+        value1, value2 = convert_to_float(value1, value2)
+    except ValueError:
+        return render_template('index.html', printed_result="Invalid input")
+
+    try:
+        result = perform_calculation(value1, value2, operation)
+        history.append(f"{value1} {operation} {value2} = {round(result, 3)}")
+        return render_template('index.html', printed_result=str(round(result, 3)))
+    except ZeroDivisionError:
+        return render_template('index.html', printed_result="Cannot divide by zero")
+
+@app.route('/history')
+def show_history():
+    return render_template('history.html', history=history)
+```
+
+```{.html filename="templates/history.html"}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Calculation History</title>
+</head>
+<body>
+    <h1>Calculation History</h1>
+    {% if history %}
+    <ul>
+        {% for entry in history %}
+        <li>{{ entry }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No calculations yet.</p>
+    {% endif %}
+    <a href="{{ url_for('home') }}">Back to calculator</a>
+</body>
+</html>
+```
+
+Add a link to `index.html` (e.g. below the form):
+
+```{.html filename="templates/index.html (addition)"}
+<a href="{{ url_for('show_history') }}">View history</a>
+```
+
+The `history` list lives in Python's memory on the server process. Restarting the server creates a fresh process, so the list is re-initialised to `[]`. In a real application you would persist this data in a database.
+:::
+
+### Exercise 9
+
+The calculator currently treats all input as floating-point numbers. Add support for **integer mode**, letting the user choose whether to work with integers or floats.
+
+- Add a pair of radio buttons to `index.html` with `name="numtype"` and values `"float"` (checked by default) and `"int"`.
+- In `helper.py`, write a new function `convert_input(value1: str, value2: str, numtype: str)` that converts both values to `int` or `float` depending on `numtype`. What happens if the user selects integer mode but enters `"3.5"`?
+- Update `flask_app.py` to read `numtype` from `request.form` and pass it to `convert_input` instead of `convert_to_float`.
+- Consider: in Python 3, `5 / 2` returns `2.5` even when both operands are `int`. If the user is in integer mode, is this the result they would expect? Update `perform_calculation` or your Flask logic so that division in integer mode uses `//` (floor division) and returns a whole number.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+```{.python filename="helper.py"}
+def perform_calculation(value1, value2, operation: str, integer_mode: bool = False):
+    """Perform a mathematical operation on two values."""
+    if operation == 'add':
+        return value1 + value2
+    elif operation == 'subtract':
+        return value1 - value2
+    elif operation == 'divide':
+        # Use floor division in integer mode so the result stays an integer
+        return value1 // value2 if integer_mode else value1 / value2
+    else:
+        return value1 * value2
+
+def convert_to_float(value1: str, value2: str) -> tuple[float, float]:
+    """Convert two strings to floating point numbers."""
+    return float(value1), float(value2)
+
+def convert_input(value1: str, value2: str, numtype: str):
+    """Convert two strings to int or float depending on numtype."""
+    if numtype == 'int':
+        # int("3.5") raises ValueError -- caught by the caller
+        return int(value1), int(value2)
+    return float(value1), float(value2)
+```
+
+```{.python filename="flask_app.py (calculate function)"}
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    value1 = request.form['value1']
+    value2 = request.form['value2']
+    operation = str(request.form['operation'])
+    numtype = request.form.get('numtype', 'float')  # default to float
+
+    if operation not in ['add', 'subtract', 'divide', 'multiply']:
+        return render_template('index.html',
+                               printed_result='Invalid operation.')
+    try:
+        value1, value2 = convert_input(value1, value2, numtype)
+    except ValueError:
+        return render_template('index.html',
+                               printed_result="Invalid input — in integer mode, enter whole numbers only.")
+
+    try:
+        integer_mode = (numtype == 'int')
+        result = perform_calculation(value1, value2, operation, integer_mode=integer_mode)
+        history.append(f"{value1} {operation} {value2} = {result}")
+        return render_template('index.html', printed_result=str(result))
+    except ZeroDivisionError:
+        return render_template('index.html', printed_result="Cannot divide by zero")
+```
+
+Add radio buttons to the form in `index.html`:
+
+```{.html filename="templates/index.html (addition inside the form)"}
+<label><input type="radio" name="numtype" value="float" checked> Float</label>
+<label><input type="radio" name="numtype" value="int"> Integer</label>
+```
+:::
+
+### Exercise 10
+
+Implement a **Reverse Polish Notation (RPN) calculator** as a new page in your app.
+
+In a standard (infix) expression like `3 + 4`, the operator sits between its operands. In **Reverse Polish Notation**, operators follow their operands: `3 4 +`. An RPN expression can be evaluated with a single left-to-right pass using a **stack**:
+
+1. For each token in the expression (split on spaces):
+    - If it is a number, **push** it onto the stack.
+    - If it is an operator (`+`, `-`, `*`, `/`), **pop** the top two values, apply the operator, and **push** the result.
+2. The single value remaining on the stack is the answer.
+
+Example: `5 1 2 + 4 * + 3 -` evaluates to `14`.
+
+You can use a Python list as a stack: `list.append(x)` pushes and `list.pop()` pops the top element.
+
+- Write an `evaluate_rpn(expression: str) -> float` function in `helper.py`. Raise a descriptive `ValueError` for malformed input (e.g. not enough operands, unknown tokens, values left over on the stack after processing all tokens).
+- Add a `/rpn` route to `flask_app.py` that accepts both GET (show the form) and POST (evaluate and show the result). A single route can handle both by checking `request.method`.
+- Create a `templates/rpn.html` template with a text input for the expression and a display for the result or error message.
+- Add a link to `/rpn` from `index.html`.
+
+Trace through the example above by hand before writing code to make sure you understand the algorithm.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+Trace of `5 1 2 + 4 * + 3 -`:
+
+| Token | Action | Stack |
+|-------|--------|-------|
+| `5` | push | `[5]` |
+| `1` | push | `[5, 1]` |
+| `2` | push | `[5, 1, 2]` |
+| `+` | pop 2 and 1, push 3 | `[5, 3]` |
+| `4` | push | `[5, 3, 4]` |
+| `*` | pop 4 and 3, push 12 | `[5, 12]` |
+| `+` | pop 12 and 5, push 17 | `[17]` |
+| `3` | push | `[17, 3]` |
+| `-` | pop 3 and 17, push 14 | `[14]` |
+
+Result: `14`.
+
+```{.python filename="helper.py (addition)"}
+def evaluate_rpn(expression: str) -> float:
+    """Evaluate a Reverse Polish Notation expression using a stack."""
+    stack = []
+    operators = {'+', '-', '*', '/'}
+
+    for token in expression.split():
+        if token in operators:
+            if len(stack) < 2:
+                raise ValueError(f"Not enough operands for operator '{token}'")
+            b = stack.pop()
+            a = stack.pop()
+            if token == '+':
+                stack.append(a + b)
+            elif token == '-':
+                stack.append(a - b)
+            elif token == '*':
+                stack.append(a * b)
+            elif token == '/':
+                if b == 0:
+                    raise ValueError("Division by zero")
+                stack.append(a / b)
+        else:
+            try:
+                stack.append(float(token))
+            except ValueError:
+                raise ValueError(f"'{token}' is not a valid number or operator")
+
+    if len(stack) != 1:
+        raise ValueError(f"Invalid expression: {len(stack)} value(s) left on the stack")
+    return stack[0]
+```
+
+```{.python filename="flask_app.py (addition)"}
+from helper import perform_calculation, convert_to_float, convert_input, evaluate_rpn
+
+@app.route('/rpn', methods=['GET', 'POST'])
+def rpn():
+    result = None
+    error = None
+    if request.method == 'POST':
+        expression = request.form['expression']
+        try:
+            result = evaluate_rpn(expression)
+        except ValueError as e:
+            error = str(e)
+    return render_template('rpn.html', result=result, error=error)
+```
+
+```{.html filename="templates/rpn.html"}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RPN Calculator</title>
+</head>
+<body>
+    <h1>RPN Calculator</h1>
+    <p>Enter a space-separated Reverse Polish Notation expression, e.g. <code>5 1 2 + 4 * + 3 -</code></p>
+    <form action="{{ url_for('rpn') }}" method="post">
+        <input type="text" name="expression" placeholder="e.g. 3 4 +" style="width: 300px;" />
+        <button type="submit">Evaluate</button>
+    </form>
+    <br>
+    {% if result is not none %}
+    <p>Result: {{ result }}</p>
+    {% endif %}
+    {% if error %}
+    <p>Error: {{ error }}</p>
+    {% endif %}
+    <a href="{{ url_for('home') }}">Back to calculator</a>
+</body>
+</html>
+```
+
+Add a link in `index.html`:
+
+```{.html filename="templates/index.html (addition)"}
+<a href="{{ url_for('rpn') }}">RPN calculator</a>
+```
+:::
