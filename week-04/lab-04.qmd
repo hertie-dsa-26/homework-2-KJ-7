@@ -25,44 +25,48 @@ By completing this lab, you will be able to:
 
 # Refresher on Coding Workflows {#workflows}
 
-## The terminal
+## The Terminal
 
-The **terminal** (also called the **shell**, **command line**, or **CLI**) is a text-based interface for interacting with your computer. Instead of clicking icons, you type commands and press Enter.
+The **terminal** (also referred to as the **shell**, **command line**, or **command line interface (CLI)**) is a text-based interface for interacting with your computer. Instead of clicking icons, you type commands.
 
-**The terminal inside your IDE is the same as the terminal outside it.** When you open a terminal tab in VS Code or another editor, it is not a special IDE terminal — it is a real shell, identical to the one you open from your Applications folder (macOS) or Start menu (Windows). Any command that works in one works in the other.
+The terminal inside your IDE is the same as the terminal outside it. When you open a terminal tab in VS Code or another editor, it is not a special IDE-specific terminal. The terminal tab launches a real shell, identical to the one you open from your Applications folder (macOS) or Start menu (Windows). Any command that works in one works in the other. One difference is that the IDE terminal typically opens with the current working directory set to the folder open in the file exploration tab.
 
-The key concept is the **current working directory (CWD)**: the folder the terminal is currently "in". Every command you run executes relative to this directory. When you run `uv run flask --app flask_app run`, for example, `uv` starts looking for `pyproject.toml` from the CWD. You can print the CWD with `pwd` (macOS/Linux) or `cd` with no arguments (Windows).
+An important concept is the **current working directory (CWD)**, which is the folder the terminal is currently "in". Every command you run executes relative to this directory. When you run `uv run flask --app flask_app run`, for example, `uv` starts looking for `pyproject.toml` from the CWD. You can print the CWD with `pwd` or `echo $PWD` on macOS or Linux and with `cd` with no arguments on Windows.
 
-To change the CWD, use `cd` (change directory):
+To change the CWD, use the change directory command `cd`:
 
 - `cd my_project` — move into the `my_project` subdirectory of the CWD.
 - `cd ..` — move up one level to the parent directory.
 - `cd /Users/yourname/Documents/my_project` — move to an absolute path, regardless of where you currently are.
 
-Before running any project command (`uv run`, `flask`, `python`, etc.), check that you are in the right directory. `ls` (macOS/Linux) or `dir` (Windows) lists the contents of the CWD, which is a quick way to confirm you are where you think you are.
+Paths beginning with `/` are absolute. Otherwise they are relative.
 
-## Virtual environments
+Before running any project command (`uv run`, `flask`, `python`, etc), make sure that you are in the right directory. Similarily, if terminal commands aren't working for you, double check the current working directory.
 
-Virtual environments help you isolate the Python packages (and their versions) that you need for a certain project from those you need for a different one. This course uses **uv** for package management.
+You can print the contents of the current working directory (CWD) with the `ls` (macOS/Linux) or `dir` (Windows) commands.
 
-With `uv`, virtual environments are local to each project directory — rather than a global folder of named environments (as with `conda`), `uv` creates a `.venv` folder inside your project. You do not need to activate it manually; `uv run` handles this for you.
+## Virtual Environments and `uv`
 
-The key commands:
+Virtual environments help you isolate the Python packages (and their versions) that you need for a certain project from those you need for a different one. This course uses `uv` for package management.
 
-- `uv init` — initialises a new project in the CWD, creating a `pyproject.toml` (which tracks your project's dependencies and Python version) and a `uv.lock` file (which pins exact versions for reproducibility).
-- `uv add <package>` — adds a dependency: records it in `pyproject.toml`, resolves and pins it in `uv.lock`, and installs it into `.venv`. This also runs `uv sync` automatically.
-- `uv sync` — reads `pyproject.toml` and `uv.lock` and brings `.venv` into alignment: installing anything missing and removing anything no longer listed. You rarely need to run this manually, since `uv run` and `uv add` trigger it automatically.
-- `uv run <command>` — runs `uv sync` to ensure the environment is up to date, then executes the command inside the managed environment. Use this wherever you would otherwise type `python` or `flask` directly (e.g. `uv run flask --app flask_app run`).
+With `uv`, virtual environments are local to each project directory — rather than a global folder of named environments (as with `conda`), `uv` creates a `.venv` folder inside your project. You do not need to activate it manually as `uv run` handles this for you.
 
-When you run `uv run`, it walks up the directory tree from the CWD until it finds a `pyproject.toml`. This means it will locate the correct project even if you are inside a subdirectory (e.g. inside `templates/`). That said, it is clearest to run commands from the project root — the same directory that contains `pyproject.toml`.
+Commands we've used include:
+
+- `uv init`: Initializes a new project in the CWD, creating a `pyproject.toml` (which tracks your project's dependencies and Python version) and a `uv.lock` file (which pins exact versions for reproducibility).
+- `uv add <package>`: Adds a dependency to the project and records it in `pyproject.toml`, resolves and pins it in `uv.lock`, and installs it into the virtual environment (`.venv`). This also runs `uv sync` automatically.
+- `uv sync`: Reads `pyproject.toml` and `uv.lock` and brings the virtual environment (`.venv`) into alignment by installing anything missing and removing anything no longer listed. You rarely need to run this manually, since `uv run`, `uv add`, and `uv remove` trigger it automatically.
+- `uv run <command>`: Runs `uv sync` to ensure the environment is up to date, then executes the command inside the managed environment. Use this wherever you would otherwise type `python` or `flask` directly (e.g. `uv run flask --app flask_app run`).
+
+When you run `uv run`, it walks up the directory tree from the CWD until it finds a `pyproject.toml`, meaning it will locate the correct project even if you are inside a subdirectory (e.g. inside `templates/`).
 
 You can ignore the `.venv` folder — it is where `uv` installs Python and packages. Keep your own project files (`flask_app.py`, `templates/`, etc.) in the project root.
 
 ## Jupyter notebooks vs Python modules (and IDEs)
 
-**Jupyter notebooks** (files with the `.ipynb` extension) are best for code exploration and for displaying code alongside markdown.
+**Jupyter notebooks** (files with the `.ipynb` extension) are best for code exploration and for displaying code alongside markdown text. They store metadata about execution and are fundamentally JSON files (and therefore painful to version control without additional tooling).
 
-**Python modules** (files with the `.py` extension) are where you write the functions and classes that will be reused later on (e.g. as part of a data science project, a web app, or even a Jupyter notebook).
+**Python modules** (files with the `.py` extension) are where you write the functions and classes that will be reused later on (e.g. as part of a data science project, a web app, or even a Jupyter notebook). They can also be executable scripts.
 
 # Dynamic Web Apps with Flask {#dynamic}
 
