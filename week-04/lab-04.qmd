@@ -70,7 +70,7 @@ You can ignore the `.venv` folder — it is where `uv` installs Python and packa
 
 ### Importing Python Modules
 
-One major reason to use `.py` files instead of notebooks is that you can **import** them (without going crazy). When Python executes `import helper` (or `from helper import some_function`), it looks for a file called `helper.py` in a set of locations, starting with the *directory of the file doing the importing*. If `flask_app.py` and `helper.py` are in the same folder, `from helper import perform_calculation` works with no additional configuration.
+One major reason to use `.py` files instead of notebooks is that you can **import** them (without going crazy). When Python executes `import helper` (or `from helper import some_function`), it looks for a file called `helper.py` in a set of locations, starting with the directory of the file doing the importing. If `flask_app.py` and `helper.py` are in the same folder, `from helper import perform_calculation` works with no additional configuration.
 
 ```bash
 my_project/
@@ -88,40 +88,55 @@ A few conventions to be aware of:
 
 # Dynamic Web Apps with Flask {#dynamic}
 
-Unlike static websites (which look the same to any user who visits them), dynamic websites can change their content based on the user and their input.
-
-Every website works on the same basic principle: you enter a URL, which triggers the browser to send a request to the web server where the website is hosted, and the server sends back an HTML file (plus whatever else is necessary) to display the page.
+Every website follows the same basic pattern: your browser sends a **request** to a server, and the server sends back a **response** — typically an HTML file that the browser then renders. What differs between static and dynamic sites is how the server produces that HTML.
 
 ## Static websites
 
-Static websites have content that is fixed and does not change based on user interactions or input. Pages are generated before being served, typically when they are first created or deployed. They consist of fixed HTML, CSS, and JavaScript files ('client-side' languages) stored on a web server. When you visit a static website, the server retrieves the stored HTML file and sends it to the browser, where it is rendered as-is.
+With a **static** website, the HTML files are prepared in advance and stored on the server as-is. When a visitor requests a page, the server simply retrieves the corresponding file and sends it--no computation happens at request time. Every visitor who requests the same URL receives exactly the same file.
+
+This is how the labs you are reading right now work. `uv run quarto render` renders `.qmd` source files into HTML once at build time, and the resulting HTML files are served directly. The server has no idea who you are or what you have done before.
 
 Pros:
 
-- Easy and fast to create, especially for small sites (e.g. portfolios, personal websites).
-- Quick loading times because the content is pre-generated and does not require server-side computation per request.
+- Easy to host: any server that can serve files works, including free platforms like GitHub Pages.
+- Fast: the server does no work per request.
+- Simple: no backend code to write or maintain.
+- Cheap: You can serve static content to huge numbers of people at very low to zero cost using **content delivery networks (CDNs)** like CloudFlare.
 
 Cons:
 
-- Not scalable: each page must be manually updated if content changes.
-- No personalisation: all users see the same content; there is no interaction based on user input or characteristics.
+- Every page has to be written (or generated) before it is published, meaning that updating content requires rebuilding and redeploying.
+- No personalisation: all visitors see the same content regardless of who they are or what they have done.
+- No interactivity that depends on the server: a contact form, a login page, or a search box that queries a database are not possible without a backend.
 
 ## Dynamic websites
 
-Dynamic websites create and deliver content on-demand based on user input, requests, or other changing data. They use server-side languages (like Python with Flask, PHP, or Ruby) in combination with client-side languages (HTML, CSS, JavaScript). Pages are generated on the server in response to each user request — the content may change based on user interaction, the data on the server, or specific requests.
+With a **dynamic** website, the server generates the HTML *at request time*, just before sending it to the browser. The server runs code (Python, Ruby, PHP, C#, etc) to produce an HTML response tailored to that specific request. The response can be built using information like what the user submitted in a form, who they are logged in as, and what is currently in a database.
+
+The sequence for a dynamic request looks like this:
+
+1. The browser sends a request to the server (e.g. `GET /profile/JACKSONMLUCKEY`).
+2. The server receives the request and runs backend code — looks up user `"JACKSONMLUCKEY"` in the database, formats their data, etc.
+3. The backend code fills a template with the resulting data to produce an HTML string.
+4. The server sends that HTML string back to the browser.
+5. The browser renders it.
+
+Step 3 is the key one: the HTML does not exist until someone requests it. Two different users requesting `/profile/JACKSONMLUCKEY` and `/profile/SOMEPERSON` get different HTML back, generated from the same template but with different data.
 
 Pros:
 
-- Scalability, personalisation, and easier to update and maintain, since content is generated dynamically (e.g. adding new posts or changing user data) without manually editing static HTML files.
+- Personalisation: each response can be tailored to the user or their input.
+- Content can be managed in a database and updated without touching HTML files.
+- The same URL can serve different content depending on state (logged in vs. logged out, search query, etc.).
 
 Cons:
 
-- Complexity: involves server-side programming, handling databases, and writing logic to generate content on demand.
-- Potentially slower load times.
+- More moving parts: a backend language, possibly a database, and a server capable of running code. This rules out most free hosting options.
+- Each request involves computation, so it is potentially slower than serving a static file — though in practice this is rarely noticeable for small apps.
 
 ## Flask and dynamic websites
 
-**Flask** is a lightweight Python framework used to build dynamic websites. Under the hood it is built on two libraries: **Werkzeug**, which receives and parses raw HTTP requests, and **Jinja2**, which renders HTML templates with dynamic data. Flask itself ships with just the essentials — routing, request handling, and templating — making it well-suited to focused apps like the calculator you will build in this lab.
+**Flask** is a lightweight Python framework used to build dynamic websites. Under the hood it is built on two libraries: **Werkzeug**, which receives and parses raw HTTP requests, and **Jinja2**, which renders HTML templates with dynamic data. Flask itself ships with just the essentials (routing, request handling, and templating).
 
 The core Flask conventions are:
 
@@ -135,34 +150,44 @@ Let's create a new Flask app, this time with slightly more advanced user input a
 
 ## Setting up
 
-* Create a new project directory, e.g. called `calculator_app`, and navigate into it. This is where you will create `flask_app.py` and your `templates` folder.
-* Initialise a new `uv` project and add Flask:
+1. Create a new project directory, e.g. called `calculator_app`, and navigate into it using your IDE and/or terminal. This is where you will create `flask_app.py` and your `templates` folder.
 
-```bash
-uv init
-uv add flask
-```
+    ```bash
+    calculator_app/
+      |-- flask_app.py
+      |-- templates/
+    ```
 
-* Delete the `hello.py` file that `uv init` creates — you will not need it.
-* The main file must be named `flask_app.py` — we will see later why this exact name matters.
-* Open the project in your IDE and create a `flask_app.py` file in the root of `calculator_app`.
-* Insert the following starter code. Include `render_template` and `request` in the import now — you will need them later:
+    - Like last week, the main file must be named `flask_app.py`.
 
-```{.python filename="flask_app.py"}
-from flask import Flask, render_template, request
+2. Initialise a new `uv` project and add Flask:
 
-app = Flask(__name__)  # create the application object
+    ```bash
+    uv init --bare
+    uv add flask
+    ```
 
-@app.route('/')
-def home():
-    return 'Home page'
-```
+    - The `--bare` skips creating a `main.py` and `README` which we don't need for now.
 
-`Flask(__name__)` creates the application object; `__name__` tells Flask where to find resources like templates relative to this file. The `@app.route('/')` decorator registers `home()` in Flask's routing table — when someone visits `/`, Flask calls `home()` and sends its return value as the response body.
+3. Update `flask_app.py` to include the following starter code. Include `render_template` and `request` in the import now — you will need them later:
 
-* Run the app:
+    ```{.python filename="flask_app.py"}
+    from flask import Flask, render_template, request
+
+    app = Flask(__name__)  # create the application object
+
+    @app.route('/')
+    def home():
+        return 'Home page'
+    ```
+
+    - `Flask(__name__)` creates the application object. `__name__` tells Flask where to find resources like templates relative to this file.
+    - The `@app.route('/')` decorator registers `home()` in Flask's routing table. When someone visits `/`, Flask calls `home()` and sends its return value as the response body.
+
+4. Run the app by:
+
     - Navigate to the `calculator_app` directory in the command line.
-    - Run `uv run flask --app flask_app run`.
+    - Run `uv run flask --app flask_app run` (where the importance of the file name `flask_app.py` comes in).
     - Open `http://127.0.0.1:5000` in a browser.
 
 ## Adding dynamic elements
@@ -194,7 +219,7 @@ def home(value1, value2):
     return str(value1 + value2)  # float is not a valid response type; convert to string
 ```
 
-Angle brackets in a route pattern (e.g. `<value1>`) are **URL variables**: Flask extracts whatever string appears at that position in the URL and passes it as an argument to the view function. The variable name in the route must match the parameter name in the function signature.
+Angle brackets in a route pattern (e.g. `<value1>`) are **URL variables**: Flask extracts whatever string appears at that position in the URL and passes it as an argument to the **view function**. The variable name in the route must match the parameter name in the **function signature**.
 
 Next, let the user choose the operation (for now, allowing only addition):
 
