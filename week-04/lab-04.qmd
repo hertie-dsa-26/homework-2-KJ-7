@@ -345,22 +345,13 @@ One option for deploying a toy app is [PythonAnywhere](https://www.pythonanywher
 
 # Exercises {#exercises}
 
+Make sure you've done the stuff we've already finished in the "lecture" part of the lab before you begin.
+
 ### Exercise 1
 
-Go through the steps in the [A Dynamic Flask example: a calculator](#example) section to create your first basic calculator app.
+Let's build on the calculator app. Extend the functionality to subtraction, multiplication, and division in addition to addition. Include a mechanism that prints a warning message when an invalid operation is entered.
 
-### Exercise 2
-
-Go through the steps in the [How to deploy your Flask app](#deployment) section to deploy your app.
-
-### Exercise 3
-
-Now that you have your first deployed app, go back to your IDE and continue working on the code for your calculator:
-
-- Extend the functionality by enabling the user to do subtraction, multiplication, and division in addition to addition.
-- Include a mechanism that prints a warning message when an invalid operation is entered.
-
-*To update the deployed website later, you can simply replace the files you uploaded to PythonAnywhere.*
+Note: To update the deployed website later, you can simply replace the files you uploaded to PythonAnywhere.
 
 ::: {.callout-tip collapse="true"}
 ## Solution
@@ -392,7 +383,7 @@ def calculate():
 ```
 :::
 
-### Exercise 4
+### Exercise 2
 
 Turn the text field used to type in the operation into a drop-down menu. Use the `<select>` form element from this [resource](https://www.w3schools.com/html/html_form_elements.asp).
 
@@ -430,7 +421,7 @@ Your `index.html` file should look something like this:
 ```
 :::
 
-### Exercise 5
+### Exercise 3
 
 What kinds of problems could you run into with this calculator? Improve your code to handle them using [exception handling](https://www.w3schools.com/python/python_try_except.asp) (try the examples in that tutorial first to understand how errors work in Python).
 
@@ -473,7 +464,7 @@ def calculate():
 ```
 :::
 
-### Exercise 6
+### Exercise 4
 
 Now do some **refactoring** of your code (code refactoring means restructuring code without changing its external behaviour, in order to improve readability, scalability, and help prevent bugs):
 
@@ -535,7 +526,7 @@ def calculate():
 ```
 :::
 
-### Exercise 7
+### Exercise 5
 
 Try calculating $4.9 - 4.845$ with your calculator. What do you see? Update your code to return the value you would expect.
 
@@ -551,13 +542,15 @@ return render_template('index.html', printed_result=str(round(result, 3)))
 ```
 
 This rounds the result to 3 decimal places before displaying it.
+
+You can do (fake) arbitrary precision for addition and subtraction by rounding to the number of decimal plces of the number with more decimal places.
 :::
 
-### Exercise 8
+### Exercise 6
 
-Add a **calculation history** page to your app.
+Add a calculation history page to your app.
 
-- Add a module-level list `history = []` in `flask_app.py`. After each successful calculation in `calculate()`, append a string describing the operation and result (e.g. `"3.0 add 4.0 = 7.0"`) to this list.
+- Add a module-level list `history` (`history = []`) in `flask_app.py`. After each successful calculation in `calculate()`, append a string describing the operation and result (e.g. `"3.0 add 4.0 = 7.0"`) to this list.
 - Add a new `/history` route that renders a `history.html` template. The template should display the history as an unordered list using a Jinja2 `{% for %}` loop, and show a message like "No calculations yet." when the list is empty (`{% if %}` / `{% else %}`).
 - Add a link in `index.html` to the history page using `url_for`.
 
@@ -632,17 +625,17 @@ Add a link to `index.html` (e.g. below the form):
 <a href="{{ url_for('show_history') }}">View history</a>
 ```
 
-The `history` list lives in Python's memory on the server process. Restarting the server creates a fresh process, so the list is re-initialised to `[]`. In a real application you would persist this data in a database.
+The `history` list lives in Python's memory on the server process. Restarting the server creates a fresh process, so the list is re-initialised to `[]`. In a real application you would persist this data in a permanent store like a database.
 :::
 
-### Exercise 9
+### Exercise 7
 
-The calculator currently treats all input as floating-point numbers. Add support for **integer mode**, letting the user choose whether to work with integers or floats.
+The calculator currently treats all input as floating-point numbers. Add support for integer mode, letting the user choose whether to work with integers or floats.
 
 - Add a pair of radio buttons to `index.html` with `name="numtype"` and values `"float"` (checked by default) and `"int"`.
 - In `helper.py`, write a new function `convert_input(value1: str, value2: str, numtype: str)` that converts both values to `int` or `float` depending on `numtype`. What happens if the user selects integer mode but enters `"3.5"`?
 - Update `flask_app.py` to read `numtype` from `request.form` and pass it to `convert_input` instead of `convert_to_float`.
-- Consider: in Python 3, `5 / 2` returns `2.5` even when both operands are `int`. If the user is in integer mode, is this the result they would expect? Update `perform_calculation` or your Flask logic so that division in integer mode uses `//` (floor division) and returns a whole number.
+- In Python 3, `5 / 2` returns `2.5` even when both `5` and `3` are `int`. If the user is in integer mode, is this the result they would expect? Update `perform_calculation` or your Flask logic so that division in integer mode uses `//` (floor division) and returns a whole number.
 
 ::: {.callout-tip collapse="true"}
 ## Solution
@@ -706,32 +699,18 @@ Add radio buttons to the form in `index.html`:
 ```
 :::
 
-### Exercise 10
+### Exercise 8
 
-Implement a **Reverse Polish Notation (RPN) calculator** as a new page in your app.
+Implement a **Reverse Polish Notation (RPN)** calculator as a new page in your app.
 
-In a standard (infix) expression like `3 + 4`, the operator sits between its operands. In **Reverse Polish Notation**, operators follow their operands: `3 4 +`. An RPN expression can be evaluated with a single left-to-right pass using a **stack**:
+In a standard (i.e. **infix**) expression like `3 + 4`, the **operator** `+` sits between its **operands** `3` and `4`. In **Reverse Polish Notation**, operators follow their operands: `3 4 +`. An RPN expression can be evaluated with a single left-to-right pass using a **stack**:
 
 1. For each token in the expression (split on spaces):
     - If it is a number, **push** it onto the stack.
     - If it is an operator (`+`, `-`, `*`, `/`), **pop** the top two values, apply the operator, and **push** the result.
 2. The single value remaining on the stack is the answer.
 
-Example: `5 1 2 + 4 * + 3 -` evaluates to `14`.
-
-You can use a Python list as a stack: `list.append(x)` pushes and `list.pop()` pops the top element.
-
-- Write an `evaluate_rpn(expression: str) -> float` function in `helper.py`. Raise a descriptive `ValueError` for malformed input (e.g. not enough operands, unknown tokens, values left over on the stack after processing all tokens).
-- Add a `/rpn` route to `flask_app.py` that accepts both GET (show the form) and POST (evaluate and show the result). A single route can handle both by checking `request.method`.
-- Create a `templates/rpn.html` template with a text input for the expression and a display for the result or error message.
-- Add a link to `/rpn` from `index.html`.
-
-Trace through the example above by hand before writing code to make sure you understand the algorithm.
-
-::: {.callout-tip collapse="true"}
-## Solution
-
-Trace of `5 1 2 + 4 * + 3 -`:
+Example: `5 1 2 + 4 * + 3 -`:
 
 | Token | Action | Stack |
 |-------|--------|-------|
@@ -747,7 +726,19 @@ Trace of `5 1 2 + 4 * + 3 -`:
 
 Result: `14`.
 
-```{.python filename="helper.py (addition)"}
+The term **pop** might have made you think of Python's `pop`. This is a good reminder that you can use a Python list as a stack. `list.append(x)` pushes and `list.pop()` pops the top element.
+
+- Write an `evaluate_rpn(expression: str) -> float` function in a new module called `rpn.py`. **Raise** a descriptive `ValueError` for malformed input (e.g. not enough operands, unknown tokens, values left over on the stack after processing all tokens).
+- Add a `/rpn` route to `flask_app.py` that accepts both **GET** (show the form) and **POST** (evaluate and show the result). A single route can handle both by checking `request.method`. On a successful evaluation (i.e. correct input), append the expression and result to `history`.
+- Create a `templates/rpn.html` template with a text input for the expression and a display for the result or error message.
+- Add a link to `/rpn` from `index.html`.
+
+Go through the example above by hand before writing code to make sure you understand the algorithm and are implementing the correct thing.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+```{.python filename="rpn.py"}
 def evaluate_rpn(expression: str) -> float:
     """Evaluate a Reverse Polish Notation expression using a stack."""
     stack = []
@@ -781,7 +772,8 @@ def evaluate_rpn(expression: str) -> float:
 ```
 
 ```{.python filename="flask_app.py (addition)"}
-from helper import perform_calculation, convert_to_float, convert_input, evaluate_rpn
+from helper import perform_calculation, convert_to_float, convert_input
+from rpn import evaluate_rpn
 
 @app.route('/rpn', methods=['GET', 'POST'])
 def rpn():
@@ -791,6 +783,7 @@ def rpn():
         expression = request.form['expression']
         try:
             result = evaluate_rpn(expression)
+            history.append(f"RPN: {expression} = {result}")
         except ValueError as e:
             error = str(e)
     return render_template('rpn.html', result=result, error=error)

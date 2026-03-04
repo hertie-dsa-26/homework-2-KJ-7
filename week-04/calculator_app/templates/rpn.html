@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RPN Calculator</title>
+</head>
+<body>
+    <h1>RPN Calculator</h1>
+    <p>Enter a space-separated Reverse Polish Notation expression, e.g. <code>5 1 2 + 4 * + 3 -</code></p>
+
+    <form action="{{ url_for('rpn') }}" method="post">
+        <input type="text" name="expression" placeholder="e.g. 3 4 +" style="width: 300px;" />
+        <button type="submit">Evaluate</button>
+    </form>
+
+    <br>
+    {% if result is not none %}
+    <p>Result: {{ result }}</p>
+    {% endif %}
+    {% if error %}
+    <p>Error: {{ error }}</p>
+    {% endif %}
+
+    <a href="{{ url_for('home') }}">Back to calculator</a>
+</body>
+</html>
