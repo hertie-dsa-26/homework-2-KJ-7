@@ -68,6 +68,24 @@ You can ignore the `.venv` folder — it is where `uv` installs Python and packa
 
 **Python modules** (files with the `.py` extension) are where you write the functions and classes that will be reused later on (e.g. as part of a data science project, a web app, or even a Jupyter notebook). They can also be executable scripts.
 
+### Importing Python Modules
+
+One major reason to use `.py` files instead of notebooks is that you can **import** them (without going crazy). When Python executes `import helper` (or `from helper import some_function`), it looks for a file called `helper.py` in a set of locations, starting with the *directory of the file doing the importing*. If `flask_app.py` and `helper.py` are in the same folder, `from helper import perform_calculation` works with no additional configuration.
+
+```bash
+my_project/
+  - flask_app.py
+  - helper.py
+```
+
+The `import` statement runs the imported file, makes its imported names available in the current namespace, and caches the result. Using the example above, `perform_calculation` is the name added to the current makespace.
+
+A few conventions to be aware of:
+
+- **Module names** are the filename without the `.py` extension. `helper.py` is imported as `helper`.
+- Avoid naming your files after standard library modules or installed packages (e.g. do not call a file `math.py` or `flask.py`), as this will shadow the real module and cause confusing import errors.
+- The `if __name__ == '__main__':` guard is used to write code that only runs when the file is executed directly (e.g. `uv run python helper.py`), not when it is imported. This is useful for putting quick tests or a `main()` call at the bottom of a module without affecting other files that import it. This is also used for writing Python scripts that will be called from the command line.
+
 # Dynamic Web Apps with Flask {#dynamic}
 
 Unlike static websites (which look the same to any user who visits them), dynamic websites can change their content based on the user and their input.
