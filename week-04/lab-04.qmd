@@ -10,6 +10,8 @@ title: Lab 4
 * [Dynamic web apps with Flask](#dynamic)
 * [A Dynamic Flask example: a calculator](#example)
 * [Deploying your Flask app](#deployment)
+* [Type Hints](#type-hints)
+* [Exception Handling](#exceptions)
 * [Exercises](#exercises)
 
 ## Learning Objectives
@@ -68,7 +70,7 @@ You can ignore the `.venv` folder — it is where `uv` installs Python and packa
 
 **Python modules** (files with the `.py` extension) are where you write the functions and classes that will be reused later on (e.g. as part of a data science project, a web app, or even a Jupyter notebook). They can also be executable scripts.
 
-### Importing Python Modules
+## Importing Python Modules
 
 One major reason to use `.py` files instead of notebooks is that you can **import** them (without going crazy). When Python executes `import helper` (or `from helper import some_function`), it looks for a file called `helper.py` in a set of locations, starting with the directory of the file doing the importing. If `flask_app.py` and `helper.py` are in the same folder, `from helper import perform_calculation` works with no additional configuration.
 
@@ -85,6 +87,115 @@ A few conventions to be aware of:
 - **Module names** are the filename without the `.py` extension. `helper.py` is imported as `helper`.
 - Avoid naming your files after standard library modules or installed packages (e.g. do not call a file `math.py` or `flask.py`), as this will shadow the real module and cause confusing import errors.
 - The `if __name__ == '__main__':` guard is used to write code that only runs when the file is executed directly (e.g. `uv run python helper.py`), not when it is imported. This is useful for putting quick tests or a `main()` call at the bottom of a module without affecting other files that import it. This is also used for writing Python scripts that will be called from the command line.
+
+## Type Hints {#type-hints}
+
+Python is a **dynamically typed** language, which means variables do not have a fixed **type**. The same variable can hold a string one moment and an integer the next, and Python only checks types at runtime. **Type hints** (also called **type annotations**) are an optional way to document the expected types of function parameters and return values directly in the code. Type hints/annotations are added after parameters using colons (`:`) and after a function definition using `->`.
+
+For example:
+
+```python
+def add(x: float, y: float) -> float:
+    return x + y
+```
+
+`x: float` and `y: float` say that `x` and `y` should be floats. The `-> float` says the function returns a float. The `:` syntax annotates a parameter, and `->` annotates the return type.
+
+Type hints have no effect at runtime. Python does not enforce them or raise errors when you pass the wrong type. Their value is as **documentation** and as input to **static analysis** tools:
+
+- Your IDE (e.g. VS Code with the Pylance extension) will underline type mismatches as you type.
+- Tools like `ty` can check your entire codebase for type errors before you run it.
+- Other developers (and your future self) can read a function signature and immediately know what it expects and returns, without reading the body.
+
+### Common types
+
+The built-in types you will use most often are `int`, `float`, `str`, and `bool`. For functions that return nothing, the return type is `None`:
+
+```python
+def greet(name: str) -> None:
+    print(f"Hello, {name}!")
+```
+
+For functions that return multiple values as a tuple, use `tuple`:
+
+```python
+def min_max(values: list) -> tuple:
+    return min(values), max(values)
+```
+
+## Exception Handling {#exceptions}
+
+When Python encounters an error it cannot recover from automatically, such as dividing by zero, converting `"hello"` to a number, or accessing a dictionary key that does not exist, it raises an **exception**. An exception is an object that describes the error. If your code does not handle it, Python prints a **traceback** (a description of the call stack at the point the error occurred) and terminates the program:
+
+```python
+Traceback (most recent call last):
+  File "app.py", line 3, in <module>
+    result = 1 / 0
+ZeroDivisionError: division by zero
+```
+
+The last line of a traceback always names the exception type and gives a message. Learning to read tracebacks is one of the most valuable debugging skills you can develop.
+
+### Common built-in exceptions
+
+| Exception | Raised when |
+|---|---|
+| `ValueError` | A function receives an argument of the right type but an invalid value (e.g. `int("hello")`) |
+| `ZeroDivisionError` | The right-hand side of a `/` or `//` operation is zero |
+| `TypeError` | An operation is applied to an object of the wrong type (e.g. `"3" + 3`) |
+| `KeyError` | A dictionary is accessed with a key that does not exist |
+| `IndexError` | A list is accessed with an index that is out of range |
+
+### `try` and `except`
+
+To handle an exception without crashing the program, wrap the code that you expect to potentially fail in a `try` block and add one or more `except` clauses that describe what to do if a particular exception occurs:
+
+```python
+try:
+    value = float(user_input)
+    result = 10 / value
+except ValueError:
+    print("That is not a valid number.")
+except ZeroDivisionError:
+    print("Cannot divide by zero.")
+```
+
+Python executes the `try` block line by line. If an exception is raised, it immediately stops and looks for a matching `except` clause. If one matches, that clause is executed and then execution continues normally after the whole `try`/`except` block. If no clause matches, the exception propagates up the call stack as normal.
+
+You should always catch **specific** exception types rather than using a bare `except:` with no type. A bare `except` catches everything, including `KeyboardInterrupt` (i.e. pressing Ctrl-C) and programming mistakes you did not anticipate, which makes bugs much harder to find.
+
+### `raise`
+
+You can signal an error from your own code with the `raise` statement:
+
+```python
+def safe_divide(a: float, b: float) -> float:
+    if b == 0:
+        raise ValueError("Denominator cannot be zero")
+    return a / b
+```
+
+`raise` followed by an exception instance (or class) immediately halts the current function and propagates the exception to the caller. The caller can then catch it with `except`. If it's not caught, it ends execution and triggers the traceback.
+
+You can include `as e` in an `except` clause to capture the exception. `as e` binds the exception object to the name `e`, so you can access its message with `str(e)`. This is useful for printing exceptions to console or log.
+
+### `else` and `finally`
+
+Two optional clauses extend the `try`/`except` structure:
+
+- `else`: runs only if the `try` block completed without raising any exception. Useful for code that should only run on success.
+- `finally`: always runs, whether or not an exception occurred. Typically used for cleanup (closing files, releasing locks).
+
+```python
+try:
+    result = perform_calculation(value1, value2, operation)
+except ZeroDivisionError:
+    print("Cannot divide by zero.")
+else:
+    print(f"Result: {result}")  # only runs if no exception
+finally:
+    print("Calculation attempt complete.")  # always runs
+```
 
 # Dynamic Web Apps with Flask {#dynamic}
 
@@ -423,7 +534,7 @@ Your `index.html` file should look something like this:
 
 ### Exercise 3
 
-What kinds of problems could you run into with this calculator? Improve your code to handle them using [exception handling](https://www.w3schools.com/python/python_try_except.asp) (try the examples in that tutorial first to understand how errors work in Python).
+What kinds of problems could you run into with this calculator? Improve your code to handle them using exception handling (see the [Exception Handling](#exceptions) section above).
 
 Hint: go through the lines of code in your `calculate` function and think about what could go wrong. One problem is related to the type of value a user might enter; another is related to one of the operations.
 

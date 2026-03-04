@@ -2296,9 +2296,18 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#the-terminal" id="toc-the-terminal" class="nav-link" data-scroll-target="#the-terminal">The Terminal</a></li>
   <li><a href="#virtual-environments-and-uv" id="toc-virtual-environments-and-uv" class="nav-link" data-scroll-target="#virtual-environments-and-uv">Virtual Environments and <code>uv</code></a></li>
-  <li><a href="#jupyter-notebooks-vs-python-modules-and-ides" id="toc-jupyter-notebooks-vs-python-modules-and-ides" class="nav-link" data-scroll-target="#jupyter-notebooks-vs-python-modules-and-ides">Jupyter notebooks vs Python modules (and IDEs)</a>
-  <ul class="collapse">
+  <li><a href="#jupyter-notebooks-vs-python-modules-and-ides" id="toc-jupyter-notebooks-vs-python-modules-and-ides" class="nav-link" data-scroll-target="#jupyter-notebooks-vs-python-modules-and-ides">Jupyter notebooks vs Python modules (and IDEs)</a></li>
   <li><a href="#importing-python-modules" id="toc-importing-python-modules" class="nav-link" data-scroll-target="#importing-python-modules">Importing Python Modules</a></li>
+  <li><a href="#type-hints" id="toc-type-hints" class="nav-link" data-scroll-target="#type-hints">Type Hints</a>
+  <ul class="collapse">
+  <li><a href="#common-types" id="toc-common-types" class="nav-link" data-scroll-target="#common-types">Common types</a></li>
+  </ul></li>
+  <li><a href="#exceptions" id="toc-exceptions" class="nav-link" data-scroll-target="#exceptions">Exception Handling</a>
+  <ul class="collapse">
+  <li><a href="#common-built-in-exceptions" id="toc-common-built-in-exceptions" class="nav-link" data-scroll-target="#common-built-in-exceptions">Common built-in exceptions</a></li>
+  <li><a href="#try-and-except" id="toc-try-and-except" class="nav-link" data-scroll-target="#try-and-except"><code>try</code> and <code>except</code></a></li>
+  <li><a href="#raise" id="toc-raise" class="nav-link" data-scroll-target="#raise"><code>raise</code></a></li>
+  <li><a href="#else-and-finally" id="toc-else-and-finally" class="nav-link" data-scroll-target="#else-and-finally"><code>else</code> and <code>finally</code></a></li>
   </ul></li>
   </ul></li>
   <li><a href="#dynamic" id="toc-dynamic" class="nav-link" data-scroll-target="#dynamic">Dynamic Web Apps with Flask</a>
@@ -2371,6 +2380,8 @@ window.Quarto = {
 <li><a href="#dynamic">Dynamic web apps with Flask</a></li>
 <li><a href="#example">A Dynamic Flask example: a calculator</a></li>
 <li><a href="#deployment">Deploying your Flask app</a></li>
+<li><a href="#type-hints">Type Hints</a></li>
+<li><a href="#exceptions">Exception Handling</a></li>
 <li><a href="#exercises">Exercises</a></li>
 </ul>
 </section>
@@ -2422,8 +2433,9 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="jupyter-notebooks-vs-python-modules-and-ides">Jupyter notebooks vs Python modules (and IDEs)</h2>
 <p><strong>Jupyter notebooks</strong> (files with the <code>.ipynb</code> extension) are best for code exploration and for displaying code alongside markdown text. They store metadata about execution and are fundamentally JSON files (and therefore painful to version control without additional tooling).</p>
 <p><strong>Python modules</strong> (files with the <code>.py</code> extension) are where you write the functions and classes that will be reused later on (e.g. as part of a data science project, a web app, or even a Jupyter notebook). They can also be executable scripts.</p>
-<section id="importing-python-modules" class="level3">
-<h3 class="anchored" data-anchor-id="importing-python-modules">Importing Python Modules</h3>
+</section>
+<section id="importing-python-modules" class="level2">
+<h2 class="anchored" data-anchor-id="importing-python-modules">Importing Python Modules</h2>
 <p>One major reason to use <code>.py</code> files instead of notebooks is that you can <strong>import</strong> them (without going crazy). When Python executes <code>import helper</code> (or <code>from helper import some_function</code>), it looks for a file called <code>helper.py</code> in a set of locations, starting with the directory of the file doing the importing. If <code>flask_app.py</code> and <code>helper.py</code> are in the same folder, <code>from helper import perform_calculation</code> works with no additional configuration.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">my_project/</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">-</span> flask_app.py</span>
@@ -2435,6 +2447,113 @@ window.Quarto = {
 <li>Avoid naming your files after standard library modules or installed packages (e.g. do not call a file <code>math.py</code> or <code>flask.py</code>), as this will shadow the real module and cause confusing import errors.</li>
 <li>The <code>if __name__ == &#39;__main__&#39;:</code> guard is used to write code that only runs when the file is executed directly (e.g. <code>uv run python helper.py</code>), not when it is imported. This is useful for putting quick tests or a <code>main()</code> call at the bottom of a module without affecting other files that import it. This is also used for writing Python scripts that will be called from the command line.</li>
 </ul>
+</section>
+<section id="type-hints" class="level2">
+<h2 class="anchored" data-anchor-id="type-hints">Type Hints</h2>
+<p>Python is a <strong>dynamically typed</strong> language, which means variables do not have a fixed <strong>type</strong>. The same variable can hold a string one moment and an integer the next, and Python only checks types at runtime. <strong>Type hints</strong> (also called <strong>type annotations</strong>) are an optional way to document the expected types of function parameters and return values directly in the code. Type hints/annotations are added after parameters using colons (<code>:</code>) and after a function definition using <code>-&gt;</code>.</p>
+<p>For example:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> add(x: <span class="bu">float</span>, y: <span class="bu">float</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x <span class="op">+</span> y</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>x: float</code> and <code>y: float</code> say that <code>x</code> and <code>y</code> should be floats. The <code>-&gt; float</code> says the function returns a float. The <code>:</code> syntax annotates a parameter, and <code>-&gt;</code> annotates the return type.</p>
+<p>Type hints have no effect at runtime. Python does not enforce them or raise errors when you pass the wrong type. Their value is as <strong>documentation</strong> and as input to <strong>static analysis</strong> tools:</p>
+<ul>
+<li>Your IDE (e.g. VS Code with the Pylance extension) will underline type mismatches as you type.</li>
+<li>Tools like <code>ty</code> can check your entire codebase for type errors before you run it.</li>
+<li>Other developers (and your future self) can read a function signature and immediately know what it expects and returns, without reading the body.</li>
+</ul>
+<section id="common-types" class="level3">
+<h3 class="anchored" data-anchor-id="common-types">Common types</h3>
+<p>The built-in types you will use most often are <code>int</code>, <code>float</code>, <code>str</code>, and <code>bool</code>. For functions that return nothing, the return type is <code>None</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> greet(name: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Hello, </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">!&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For functions that return multiple values as a tuple, use <code>tuple</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> min_max(values: <span class="bu">list</span>) <span class="op">-&gt;</span> <span class="bu">tuple</span>:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">min</span>(values), <span class="bu">max</span>(values)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="exceptions" class="level2">
+<h2 class="anchored" data-anchor-id="exceptions">Exception Handling</h2>
+<p>When Python encounters an error it cannot recover from automatically, such as dividing by zero, converting <code>&quot;hello&quot;</code> to a number, or accessing a dictionary key that does not exist, it raises an <strong>exception</strong>. An exception is an object that describes the error. If your code does not handle it, Python prints a <strong>traceback</strong> (a description of the call stack at the point the error occurred) and terminates the program:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Traceback (most recent call last):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  File <span class="st">&quot;app.py&quot;</span>, line <span class="dv">3</span>, <span class="kw">in</span> <span class="op">&lt;</span>module<span class="op">&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> <span class="dv">0</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="pp">ZeroDivisionError</span>: division by zero</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The last line of a traceback always names the exception type and gives a message. Learning to read tracebacks is one of the most valuable debugging skills you can develop.</p>
+<section id="common-built-in-exceptions" class="level3">
+<h3 class="anchored" data-anchor-id="common-built-in-exceptions">Common built-in exceptions</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Exception</th>
+<th>Raised when</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ValueError</code></td>
+<td>A function receives an argument of the right type but an invalid value (e.g. <code>int(&quot;hello&quot;)</code>)</td>
+</tr>
+<tr class="even">
+<td><code>ZeroDivisionError</code></td>
+<td>The right-hand side of a <code>/</code> or <code>//</code> operation is zero</td>
+</tr>
+<tr class="odd">
+<td><code>TypeError</code></td>
+<td>An operation is applied to an object of the wrong type (e.g. <code>&quot;3&quot; + 3</code>)</td>
+</tr>
+<tr class="even">
+<td><code>KeyError</code></td>
+<td>A dictionary is accessed with a key that does not exist</td>
+</tr>
+<tr class="odd">
+<td><code>IndexError</code></td>
+<td>A list is accessed with an index that is out of range</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="try-and-except" class="level3">
+<h3 class="anchored" data-anchor-id="try-and-except"><code>try</code> and <code>except</code></h3>
+<p>To handle an exception without crashing the program, wrap the code that you expect to potentially fail in a <code>try</code> block and add one or more <code>except</code> clauses that describe what to do if a particular exception occurs:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    value <span class="op">=</span> <span class="bu">float</span>(user_input)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> <span class="dv">10</span> <span class="op">/</span> value</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;That is not a valid number.&quot;</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ZeroDivisionError</span>:</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Cannot divide by zero.&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Python executes the <code>try</code> block line by line. If an exception is raised, it immediately stops and looks for a matching <code>except</code> clause. If one matches, that clause is executed and then execution continues normally after the whole <code>try</code>/<code>except</code> block. If no clause matches, the exception propagates up the call stack as normal.</p>
+<p>You should always catch <strong>specific</strong> exception types rather than using a bare <code>except:</code> with no type. A bare <code>except</code> catches everything, including <code>KeyboardInterrupt</code> (i.e. pressing Ctrl-C) and programming mistakes you did not anticipate, which makes bugs much harder to find.</p>
+</section>
+<section id="raise" class="level3">
+<h3 class="anchored" data-anchor-id="raise"><code>raise</code></h3>
+<p>You can signal an error from your own code with the <code>raise</code> statement:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> safe_divide(a: <span class="bu">float</span>, b: <span class="bu">float</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> b <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&quot;Denominator cannot be zero&quot;</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> a <span class="op">/</span> b</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>raise</code> followed by an exception instance (or class) immediately halts the current function and propagates the exception to the caller. The caller can then catch it with <code>except</code>. If it’s not caught, it ends execution and triggers the traceback.</p>
+<p>You can include <code>as e</code> in an <code>except</code> clause to capture the exception. <code>as e</code> binds the exception object to the name <code>e</code>, so you can access its message with <code>str(e)</code>. This is useful for printing exceptions to console or log.</p>
+</section>
+<section id="else-and-finally" class="level3">
+<h3 class="anchored" data-anchor-id="else-and-finally"><code>else</code> and <code>finally</code></h3>
+<p>Two optional clauses extend the <code>try</code>/<code>except</code> structure:</p>
+<ul>
+<li><code>else</code>: runs only if the <code>try</code> block completed without raising any exception. Useful for code that should only run on success.</li>
+<li><code>finally</code>: always runs, whether or not an exception occurred. Typically used for cleanup (closing files, releasing locks).</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> perform_calculation(value1, value2, operation)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ZeroDivisionError</span>:</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Cannot divide by zero.&quot;</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Result: </span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">&quot;</span>)  <span class="co"># only runs if no exception</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="cf">finally</span>:</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Calculation attempt complete.&quot;</span>)  <span class="co"># always runs</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 </section>
@@ -2501,15 +2620,15 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="setting-up">Setting up</h2>
 <ol type="1">
 <li><p>Create a new project directory, e.g. called <code>calculator_app</code>, and navigate into it using your IDE and/or terminal. This is where you will create <code>flask_app.py</code> and your <code>templates</code> folder.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">calculator_app/</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">|</span><span class="ex">--</span> flask_app.py</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">|</span><span class="ex">--</span> templates/</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">calculator_app/</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">|</span><span class="ex">--</span> flask_app.py</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">|</span><span class="ex">--</span> templates/</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>Like last week, the main file must be named <code>flask_app.py</code>.</li>
 </ul></li>
 <li><p>Initialise a new <code>uv</code> project and add Flask:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> init <span class="at">--bare</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> add flask</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> init <span class="at">--bare</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> add flask</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>The <code>--bare</code> skips creating a <code>main.py</code> and <code>README</code> which we don’t need for now.</li>
 </ul></li>
@@ -2518,13 +2637,13 @@ window.Quarto = {
 <div class="code-with-filename-file">
 <pre><strong>flask_app.py</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, render_template, request</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)  <span class="co"># create the application object</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&#39;</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home():</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&#39;Home page&#39;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, render_template, request</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)  <span class="co"># create the application object</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&#39;</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home():</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&#39;Home page&#39;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ul>
 <li><code>Flask(__name__)</code> creates the application object. <code>__name__</code> tells Flask where to find resources like templates relative to this file.</li>
@@ -2547,12 +2666,12 @@ window.Quarto = {
 <div class="code-with-filename-file">
 <pre><strong>flask_app.py</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&#39;</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home():</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> <span class="dv">3</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> <span class="dv">4</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> value1 <span class="op">+</span> value2</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">str</span>(result)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&#39;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home():</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> <span class="dv">4</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> value1 <span class="op">+</span> value2</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">str</span>(result)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Save the module and refresh the browser. What does it show?</p>
 </section>
@@ -2563,11 +2682,11 @@ window.Quarto = {
 <div class="code-with-filename-file">
 <pre><strong>flask_app.py</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&lt;value1&gt;_&lt;value2&gt;&#39;</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home(value1, value2):</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> <span class="bu">float</span>(value1)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> <span class="bu">float</span>(value2)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">str</span>(value1 <span class="op">+</span> value2)  <span class="co"># float is not a valid response type; convert to string</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&lt;value1&gt;_&lt;value2&gt;&#39;</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home(value1, value2):</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> <span class="bu">float</span>(value1)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> <span class="bu">float</span>(value2)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">str</span>(value1 <span class="op">+</span> value2)  <span class="co"># float is not a valid response type; convert to string</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Angle brackets in a route pattern (e.g. <code>&lt;value1&gt;</code>) delineate <strong>URL variables</strong>. Flask extracts whatever string appears at that position in the URL and passes it as an argument to the view function. With our current <code>home</code> view function, visiting <code>http://127.0.0.1:5000/3.0_4.5</code> would call <code>home(value1=&#39;3.0&#39;, value2=&#39;4.5&#39;)</code>, and visiting <code>http://127.0.0.1:5000/10_20</code> would call <code>home(value1=&#39;10&#39;, value2=&#39;20&#39;)</code>. All URL variables are captured as strings by default; you can add a type converter like <code>&lt;float:value1&gt;</code> to have Flask <strong>validate</strong> and <strong>conver</strong>t the value before passing it to the function. If you want a recap, see lab 03.</p>
 <p>The variable names in the route (<code>&lt;value1&gt;</code>, <code>&lt;value2&gt;</code>) must match the parameter names in the <strong>function signature</strong>. A function’s signature is the function’s name combined with its parameter list. For example, the signature of <code>def home(value1, value2):</code> is <code>home(value1, value2)</code>. Flask uses the signature to know which URL segment maps to which argument when calling the function.</p>
@@ -2576,14 +2695,14 @@ window.Quarto = {
 <div class="code-with-filename-file">
 <pre><strong>flask_app.py</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&lt;value1&gt;_&lt;operation&gt;_&lt;value2&gt;&#39;</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home(value1, value2, operation):</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> <span class="bu">float</span>(value1)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> <span class="bu">float</span>(value2)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="op">==</span> <span class="st">&#39;addition&#39;</span>:</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">str</span>(value1 <span class="op">+</span> value2)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">&#39;Operation must be &quot;addition&quot;&#39;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&lt;value1&gt;_&lt;operation&gt;_&lt;value2&gt;&#39;</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home(value1, value2, operation):</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> <span class="bu">float</span>(value1)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> <span class="bu">float</span>(value2)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="op">==</span> <span class="st">&#39;addition&#39;</span>:</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">str</span>(value1 <span class="op">+</span> value2)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">&#39;Operation must be &quot;addition&quot;&#39;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Note: We could have done <code>/&lt;float:value1&gt;_&lt;operation&gt;_&lt;float:value2&gt;</code> to have Flask validate and convert <code>value1</code> and <code>value2</code> for us.</p>
 </section>
@@ -2600,28 +2719,28 @@ window.Quarto = {
 <div class="code-with-filename-file">
 <pre><strong>templates/index.html</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="templates/index.html"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;!DOCTYPE</span> html<span class="dt">&gt;</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="dt">&gt;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">head</span><span class="dt">&gt;</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">title</span><span class="dt">&gt;</span>Flask Calculator<span class="dt">&lt;/</span><span class="kw">title</span><span class="dt">&gt;</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">head</span><span class="dt">&gt;</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Calculator<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> action</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;calculate&#39;)}}&quot;</span><span class="ot"> method</span><span class="op">=</span><span class="st">&quot;post&quot;</span><span class="dt">&gt;</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;value1&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;Enter the first number&quot;</span><span class="ot"> required</span><span class="op">=</span><span class="st">&quot;required&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;value2&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;Enter the second number&quot;</span><span class="ot"> required</span><span class="op">=</span><span class="st">&quot;required&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;operation&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;addition&quot;</span><span class="ot"> required</span><span class="op">=</span><span class="st">&quot;required&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">button</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;submit&quot;</span><span class="dt">&gt;</span>Calculate<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">br</span><span class="dt">&gt;</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>{{ printed_result }}</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15" data-filename="templates/index.html"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;!DOCTYPE</span> html<span class="dt">&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="dt">&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">head</span><span class="dt">&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">title</span><span class="dt">&gt;</span>Flask Calculator<span class="dt">&lt;/</span><span class="kw">title</span><span class="dt">&gt;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">head</span><span class="dt">&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Calculator<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> action</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;calculate&#39;)}}&quot;</span><span class="ot"> method</span><span class="op">=</span><span class="st">&quot;post&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;value1&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;Enter the first number&quot;</span><span class="ot"> required</span><span class="op">=</span><span class="st">&quot;required&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;value2&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;Enter the second number&quot;</span><span class="ot"> required</span><span class="op">=</span><span class="st">&quot;required&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;operation&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;addition&quot;</span><span class="ot"> required</span><span class="op">=</span><span class="st">&quot;required&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">button</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;submit&quot;</span><span class="dt">&gt;</span>Calculate<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">br</span><span class="dt">&gt;</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>{{ printed_result }}</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The <code>action</code> attribute specifies the URL that the form data is sent to when the user clicks submit. <code>url_for(&#39;calculate&#39;)</code> is a Flask function that generates a URL from a view function’s name–in this case, resolving the <code>calculate</code> view function to the <code>/calculate</code> route. Using <code>url_for</code> rather than hard-coding <code>/calculate</code> means the URL stays correct even if you restructure your routes.</p>
 <p>The <code>method</code> attribute specifies which <strong>HTTP method</strong> to use. HTTP methods convey the <em>intent</em> of a request: <strong>GET</strong> means “retrieve this resource”, <strong>POST</strong> means “submit data to be processed”. When a form uses <strong>POST</strong>, the browser packages the form fields into the request body, keeping them out of the URL and out of the browser’s address bar and history. This is the conventional choice when the submission causes something to happen on the server (e.g. a calculation, creating an account, posting a comment). <strong>GET</strong> appends the form data to the URL as query parameters (e.g. <code>/search?q=flask&amp;page=2</code>), which makes the request bookmarkable and shareable, which is appropriate and often desirable for read-only operations like searches. By default, Flask routes only accept GET requests, so we need to add <code>methods=[&#39;POST&#39;]</code> to the route decorator to allow POST. - The <code>name</code> tags on each input determine how the data is labelled when it reaches the server. For example, <code>name=&quot;value1&quot;</code> means Flask will access this field using <code>request.form[&#39;value1&#39;]</code> when the form is submitted.</p>
@@ -2633,26 +2752,26 @@ window.Quarto = {
 <div class="code-with-filename-file">
 <pre><strong>flask_app.py</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&#39;</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home():</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/calculate&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;POST&#39;</span>])  <span class="co"># associate the POST method with this route</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate():</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># retrieve values sent to the server via POST</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> request.form[<span class="st">&#39;value1&#39;</span>]</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> request.form[<span class="st">&#39;value2&#39;</span>]</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    operation <span class="op">=</span> <span class="bu">str</span>(request.form[<span class="st">&#39;operation&#39;</span>])</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># convert input to floating point</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> <span class="bu">float</span>(value1)</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> <span class="bu">float</span>(value2)</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="op">==</span> <span class="st">&#39;addition&#39;</span>:</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(value1 <span class="op">+</span> value2))</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&#39;Operation must be &quot;addition&quot;&#39;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&#39;</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home():</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/calculate&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;POST&#39;</span>])  <span class="co"># associate the POST method with this route</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate():</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># retrieve values sent to the server via POST</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> request.form[<span class="st">&#39;value1&#39;</span>]</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> request.form[<span class="st">&#39;value2&#39;</span>]</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    operation <span class="op">=</span> <span class="bu">str</span>(request.form[<span class="st">&#39;operation&#39;</span>])</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># convert input to floating point</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> <span class="bu">float</span>(value1)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> <span class="bu">float</span>(value2)</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="op">==</span> <span class="st">&#39;addition&#39;</span>:</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(value1 <span class="op">+</span> value2))</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&#39;Operation must be &quot;addition&quot;&#39;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><code>request</code> is a Flask object that contains everything about the incoming HTTP request. <code>request.form</code> is a dictionary-like object populated with the form fields from a POST submission, accessible by each input’s <code>name</code> attribute (e.g. <code>value1</code> and <code>value2</code> in our case).</p>
 <p><code>render_template(&#39;index.html&#39;, printed_result=...)</code> finds <code>templates/index.html</code>, fills in the <code>{ printed_result }</code> Jinja2 placeholder with the value you pass, and returns the resulting HTML. Any keyword argument you pass to <code>render_template</code> becomes a variable available inside the Jinja2 template.</p>
@@ -2719,27 +2838,27 @@ window.Quarto = {
 <div class="code-with-filename-file">
 <pre><strong>flask_app.py</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/calculate&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;POST&#39;</span>])</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate():</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> request.form[<span class="st">&#39;value1&#39;</span>]</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> request.form[<span class="st">&#39;value2&#39;</span>]</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    operation <span class="op">=</span> <span class="bu">str</span>(request.form[<span class="st">&#39;operation&#39;</span>])</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> <span class="bu">float</span>(value1)</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> <span class="bu">float</span>(value2)</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="op">==</span> <span class="st">&#39;add&#39;</span>:</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> value1 <span class="op">+</span> value2</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;subtract&#39;</span>:</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> value1 <span class="op">-</span> value2</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;divide&#39;</span>:</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> value1 <span class="op">/</span> value2</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;multiply&#39;</span>:</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> value1 <span class="op">*</span> value2</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>,</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>                               printed_result<span class="op">=</span><span class="st">&#39;Operation must be one of &quot;add&quot;, &quot;subtract&quot;, &quot;divide&quot;, or &quot;multiply&quot;.&#39;</span>)</span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(result))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/calculate&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;POST&#39;</span>])</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate():</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> request.form[<span class="st">&#39;value1&#39;</span>]</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> request.form[<span class="st">&#39;value2&#39;</span>]</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    operation <span class="op">=</span> <span class="bu">str</span>(request.form[<span class="st">&#39;operation&#39;</span>])</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> <span class="bu">float</span>(value1)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> <span class="bu">float</span>(value2)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="op">==</span> <span class="st">&#39;add&#39;</span>:</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> value1 <span class="op">+</span> value2</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;subtract&#39;</span>:</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> value1 <span class="op">-</span> value2</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;divide&#39;</span>:</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> value1 <span class="op">/</span> value2</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;multiply&#39;</span>:</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> value1 <span class="op">*</span> value2</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>,</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>                               printed_result<span class="op">=</span><span class="st">&#39;Operation must be one of &quot;add&quot;, &quot;subtract&quot;, &quot;divide&quot;, or &quot;multiply&quot;.&#39;</span>)</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(result))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -2766,29 +2885,29 @@ window.Quarto = {
 <div class="code-with-filename-file">
 <pre><strong>templates/index.html</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="templates/index.html"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;!DOCTYPE</span> html<span class="dt">&gt;</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="dt">&gt;</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">head</span><span class="dt">&gt;</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">title</span><span class="dt">&gt;</span>Flask Calculator<span class="dt">&lt;/</span><span class="kw">title</span><span class="dt">&gt;</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">head</span><span class="dt">&gt;</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Calculator<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> action</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;calculate&#39;)}}&quot;</span><span class="ot"> method</span><span class="op">=</span><span class="st">&quot;post&quot;</span><span class="dt">&gt;</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;value1&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;Enter the first number&quot;</span><span class="ot"> required</span><span class="op">=</span><span class="st">&quot;required&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;value2&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;Enter the second number&quot;</span><span class="ot"> required</span><span class="op">=</span><span class="st">&quot;required&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">label</span><span class="ot"> for</span><span class="op">=</span><span class="st">&quot;operation&quot;</span><span class="dt">&gt;</span>Operation<span class="dt">&lt;/</span><span class="kw">label</span><span class="dt">&gt;</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">select</span><span class="ot"> id</span><span class="op">=</span><span class="st">&quot;operation&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;operation&quot;</span><span class="dt">&gt;</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&lt;</span><span class="kw">option</span><span class="ot"> value</span><span class="op">=</span><span class="st">&quot;add&quot;</span><span class="dt">&gt;</span>Add<span class="dt">&lt;/</span><span class="kw">option</span><span class="dt">&gt;</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&lt;</span><span class="kw">option</span><span class="ot"> value</span><span class="op">=</span><span class="st">&quot;subtract&quot;</span><span class="dt">&gt;</span>Subtract<span class="dt">&lt;/</span><span class="kw">option</span><span class="dt">&gt;</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&lt;</span><span class="kw">option</span><span class="ot"> value</span><span class="op">=</span><span class="st">&quot;divide&quot;</span><span class="dt">&gt;</span>Divide<span class="dt">&lt;/</span><span class="kw">option</span><span class="dt">&gt;</span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&lt;</span><span class="kw">option</span><span class="ot"> value</span><span class="op">=</span><span class="st">&quot;multiply&quot;</span><span class="dt">&gt;</span>Multiply<span class="dt">&lt;/</span><span class="kw">option</span><span class="dt">&gt;</span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;/</span><span class="kw">select</span><span class="dt">&gt;</span></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">button</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;submit&quot;</span><span class="dt">&gt;</span>Calculate<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>   <span class="dt">&lt;</span><span class="kw">br</span><span class="dt">&gt;</span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>   {{ printed_result }}</span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18" data-filename="templates/index.html"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;!DOCTYPE</span> html<span class="dt">&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="dt">&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">head</span><span class="dt">&gt;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">title</span><span class="dt">&gt;</span>Flask Calculator<span class="dt">&lt;/</span><span class="kw">title</span><span class="dt">&gt;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">head</span><span class="dt">&gt;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Calculator<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> action</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;calculate&#39;)}}&quot;</span><span class="ot"> method</span><span class="op">=</span><span class="st">&quot;post&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;value1&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;Enter the first number&quot;</span><span class="ot"> required</span><span class="op">=</span><span class="st">&quot;required&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;value2&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;Enter the second number&quot;</span><span class="ot"> required</span><span class="op">=</span><span class="st">&quot;required&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">label</span><span class="ot"> for</span><span class="op">=</span><span class="st">&quot;operation&quot;</span><span class="dt">&gt;</span>Operation<span class="dt">&lt;/</span><span class="kw">label</span><span class="dt">&gt;</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">select</span><span class="ot"> id</span><span class="op">=</span><span class="st">&quot;operation&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;operation&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&lt;</span><span class="kw">option</span><span class="ot"> value</span><span class="op">=</span><span class="st">&quot;add&quot;</span><span class="dt">&gt;</span>Add<span class="dt">&lt;/</span><span class="kw">option</span><span class="dt">&gt;</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&lt;</span><span class="kw">option</span><span class="ot"> value</span><span class="op">=</span><span class="st">&quot;subtract&quot;</span><span class="dt">&gt;</span>Subtract<span class="dt">&lt;/</span><span class="kw">option</span><span class="dt">&gt;</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&lt;</span><span class="kw">option</span><span class="ot"> value</span><span class="op">=</span><span class="st">&quot;divide&quot;</span><span class="dt">&gt;</span>Divide<span class="dt">&lt;/</span><span class="kw">option</span><span class="dt">&gt;</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&lt;</span><span class="kw">option</span><span class="ot"> value</span><span class="op">=</span><span class="st">&quot;multiply&quot;</span><span class="dt">&gt;</span>Multiply<span class="dt">&lt;/</span><span class="kw">option</span><span class="dt">&gt;</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;/</span><span class="kw">select</span><span class="dt">&gt;</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">button</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;submit&quot;</span><span class="dt">&gt;</span>Calculate<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>   <span class="dt">&lt;</span><span class="kw">br</span><span class="dt">&gt;</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>   {{ printed_result }}</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -2796,7 +2915,7 @@ window.Quarto = {
 </section>
 <section id="exercise-3" class="level3">
 <h3 class="anchored" data-anchor-id="exercise-3">Exercise 3</h3>
-<p>What kinds of problems could you run into with this calculator? Improve your code to handle them using <a href="https://www.w3schools.com/python/python_try_except.asp">exception handling</a> (try the examples in that tutorial first to understand how errors work in Python).</p>
+<p>What kinds of problems could you run into with this calculator? Improve your code to handle them using exception handling (see the <a href="#exceptions">Exception Handling</a> section above).</p>
 <p>Hint: go through the lines of code in your <code>calculate</code> function and think about what could go wrong. One problem is related to the type of value a user might enter; another is related to one of the operations.</p>
 <div class="callout callout-style-default callout-tip no-icon callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
@@ -2819,31 +2938,31 @@ window.Quarto = {
 <div class="code-with-filename-file">
 <pre><strong>flask_app.py</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/calculate&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;POST&#39;</span>])</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate():</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> request.form[<span class="st">&#39;value1&#39;</span>]</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> request.form[<span class="st">&#39;value2&#39;</span>]</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    operation <span class="op">=</span> <span class="bu">str</span>(request.form[<span class="st">&#39;operation&#39;</span>])</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&#39;add&#39;</span>, <span class="st">&#39;subtract&#39;</span>, <span class="st">&#39;divide&#39;</span>, <span class="st">&#39;multiply&#39;</span>]:</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>,</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>                               printed_result<span class="op">=</span><span class="st">&#39;Operation must be one of &quot;add&quot;, &quot;subtract&quot;, &quot;divide&quot;, or &quot;multiply&quot;.&#39;</span>)</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        value1 <span class="op">=</span> <span class="bu">float</span>(value1)</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>        value2 <span class="op">=</span> <span class="bu">float</span>(value2)</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> operation <span class="op">==</span> <span class="st">&#39;add&#39;</span>:</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> value1 <span class="op">+</span> value2</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;subtract&#39;</span>:</span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> value1 <span class="op">-</span> value2</span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;divide&#39;</span>:</span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> value1 <span class="op">/</span> value2</span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> value1 <span class="op">*</span> value2</span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(result))</span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ZeroDivisionError</span>:</span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;You cannot divide by zero&quot;</span>)</span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;Cannot perform operation with this input&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/calculate&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;POST&#39;</span>])</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate():</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> request.form[<span class="st">&#39;value1&#39;</span>]</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> request.form[<span class="st">&#39;value2&#39;</span>]</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    operation <span class="op">=</span> <span class="bu">str</span>(request.form[<span class="st">&#39;operation&#39;</span>])</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&#39;add&#39;</span>, <span class="st">&#39;subtract&#39;</span>, <span class="st">&#39;divide&#39;</span>, <span class="st">&#39;multiply&#39;</span>]:</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>                               printed_result<span class="op">=</span><span class="st">&#39;Operation must be one of &quot;add&quot;, &quot;subtract&quot;, &quot;divide&quot;, or &quot;multiply&quot;.&#39;</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>        value1 <span class="op">=</span> <span class="bu">float</span>(value1)</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>        value2 <span class="op">=</span> <span class="bu">float</span>(value2)</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> operation <span class="op">==</span> <span class="st">&#39;add&#39;</span>:</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> value1 <span class="op">+</span> value2</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;subtract&#39;</span>:</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> value1 <span class="op">-</span> value2</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;divide&#39;</span>:</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> value1 <span class="op">/</span> value2</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> value1 <span class="op">*</span> value2</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(result))</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ZeroDivisionError</span>:</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;You cannot divide by zero&quot;</span>)</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;Cannot perform operation with this input&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -2875,53 +2994,53 @@ window.Quarto = {
 <div class="code-with-filename-file">
 <pre><strong>helper.py</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="helper.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> perform_calculation(value1: <span class="bu">float</span>, value2: <span class="bu">float</span>, operation: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Perform a mathematical operation on two values.&quot;&quot;&quot;</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="op">==</span> <span class="st">&#39;add&#39;</span>:</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">+</span> value2</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;subtract&#39;</span>:</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">-</span> value2</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;divide&#39;</span>:</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">/</span> value2</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">*</span> value2</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> convert_to_float(value1: <span class="bu">str</span>, value2: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">tuple</span>[<span class="bu">float</span>, <span class="bu">float</span>]:</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Convert two strings to floating point numbers.&quot;&quot;&quot;</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(value1), <span class="bu">float</span>(value2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20" data-filename="helper.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> perform_calculation(value1: <span class="bu">float</span>, value2: <span class="bu">float</span>, operation: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Perform a mathematical operation on two values.&quot;&quot;&quot;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="op">==</span> <span class="st">&#39;add&#39;</span>:</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">+</span> value2</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;subtract&#39;</span>:</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">-</span> value2</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;divide&#39;</span>:</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">/</span> value2</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">*</span> value2</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> convert_to_float(value1: <span class="bu">str</span>, value2: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">tuple</span>[<span class="bu">float</span>, <span class="bu">float</span>]:</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Convert two strings to floating point numbers.&quot;&quot;&quot;</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(value1), <span class="bu">float</span>(value2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>flask_app.py</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, render_template, request</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> helper <span class="im">import</span> perform_calculation, convert_to_float</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&#39;</span>)</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home():</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>)</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/calculate&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;POST&#39;</span>])</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate():</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> request.form[<span class="st">&#39;value1&#39;</span>]</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> request.form[<span class="st">&#39;value2&#39;</span>]</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    operation <span class="op">=</span> <span class="bu">str</span>(request.form[<span class="st">&#39;operation&#39;</span>])</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&#39;add&#39;</span>, <span class="st">&#39;subtract&#39;</span>, <span class="st">&#39;divide&#39;</span>, <span class="st">&#39;multiply&#39;</span>]:</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>,</span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>                               printed_result<span class="op">=</span><span class="st">&#39;Invalid operation.&#39;</span>)</span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>        value1, value2 <span class="op">=</span> convert_to_float(value1, value2)</span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;Invalid input&quot;</span>)</span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> perform_calculation(value1, value2, operation)</span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(result))</span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ZeroDivisionError</span>:</span>
-<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;Cannot divide by zero&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, render_template, request</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> helper <span class="im">import</span> perform_calculation, convert_to_float</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&#39;</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home():</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/calculate&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;POST&#39;</span>])</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate():</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> request.form[<span class="st">&#39;value1&#39;</span>]</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> request.form[<span class="st">&#39;value2&#39;</span>]</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    operation <span class="op">=</span> <span class="bu">str</span>(request.form[<span class="st">&#39;operation&#39;</span>])</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&#39;add&#39;</span>, <span class="st">&#39;subtract&#39;</span>, <span class="st">&#39;divide&#39;</span>, <span class="st">&#39;multiply&#39;</span>]:</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>,</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>                               printed_result<span class="op">=</span><span class="st">&#39;Invalid operation.&#39;</span>)</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>        value1, value2 <span class="op">=</span> convert_to_float(value1, value2)</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;Invalid input&quot;</span>)</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> perform_calculation(value1, value2, operation)</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(result))</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ZeroDivisionError</span>:</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;Cannot divide by zero&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -2944,7 +3063,7 @@ window.Quarto = {
 <div class="callout-body-container callout-body">
 <p>The result is <code>0.055000000000000604</code> instead of the expected <code>0.055</code>. This is a <strong>floating-point precision error</strong> — decimal numbers cannot always be represented exactly as binary fractions.</p>
 <p>Use Python’s built-in <code>round()</code> function to fix this:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(<span class="bu">round</span>(result, <span class="dv">3</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(<span class="bu">round</span>(result, <span class="dv">3</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This rounds the result to 3 decimal places before displaying it.</p>
 <p>You can do (fake) arbitrary precision for addition and subtraction by rounding to the number of decimal plces of the number with more decimal places.</p>
 </div>
@@ -2953,9 +3072,9 @@ window.Quarto = {
 </section>
 <section id="exercise-6" class="level3">
 <h3 class="anchored" data-anchor-id="exercise-6">Exercise 6</h3>
-<p>Add a <strong>calculation history</strong> page to your app.</p>
+<p>Add a calculation history page to your app.</p>
 <ul>
-<li>Add a module-level list <code>history = []</code> in <code>flask_app.py</code>. After each successful calculation in <code>calculate()</code>, append a string describing the operation and result (e.g. <code>&quot;3.0 add 4.0 = 7.0&quot;</code>) to this list.</li>
+<li>Add a module-level list <code>history</code> (<code>history = []</code>) in <code>flask_app.py</code>. After each successful calculation in <code>calculate()</code>, append a string describing the operation and result (e.g. <code>&quot;3.0 add 4.0 = 7.0&quot;</code>) to this list.</li>
 <li>Add a new <code>/history</code> route that renders a <code>history.html</code> template. The template should display the history as an unordered list using a Jinja2 <code>{% for %}</code> loop, and show a message like “No calculations yet.” when the list is empty (<code>{% if %}</code> / <code>{% else %}</code>).</li>
 <li>Add a link in <code>index.html</code> to the history page using <code>url_for</code>.</li>
 </ul>
@@ -2976,72 +3095,72 @@ window.Quarto = {
 <div class="code-with-filename-file">
 <pre><strong>flask_app.py</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, render_template, request</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> helper <span class="im">import</span> perform_calculation, convert_to_float</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>history <span class="op">=</span> []  <span class="co"># in-memory list; cleared on server restart</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&#39;</span>)</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home():</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>)</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/calculate&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;POST&#39;</span>])</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate():</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> request.form[<span class="st">&#39;value1&#39;</span>]</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> request.form[<span class="st">&#39;value2&#39;</span>]</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    operation <span class="op">=</span> <span class="bu">str</span>(request.form[<span class="st">&#39;operation&#39;</span>])</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&#39;add&#39;</span>, <span class="st">&#39;subtract&#39;</span>, <span class="st">&#39;divide&#39;</span>, <span class="st">&#39;multiply&#39;</span>]:</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>,</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>                               printed_result<span class="op">=</span><span class="st">&#39;Invalid operation.&#39;</span>)</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>        value1, value2 <span class="op">=</span> convert_to_float(value1, value2)</span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;Invalid input&quot;</span>)</span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> perform_calculation(value1, value2, operation)</span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>        history.append(<span class="ss">f&quot;</span><span class="sc">{</span>value1<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>operation<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>value2<span class="sc">}</span><span class="ss"> = </span><span class="sc">{</span><span class="bu">round</span>(result, <span class="dv">3</span>)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(<span class="bu">round</span>(result, <span class="dv">3</span>)))</span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ZeroDivisionError</span>:</span>
-<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;Cannot divide by zero&quot;</span>)</span>
-<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/history&#39;</span>)</span>
-<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_history():</span>
-<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&#39;history.html&#39;</span>, history<span class="op">=</span>history)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, render_template, request</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> helper <span class="im">import</span> perform_calculation, convert_to_float</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>history <span class="op">=</span> []  <span class="co"># in-memory list; cleared on server restart</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&#39;</span>)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home():</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/calculate&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;POST&#39;</span>])</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate():</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> request.form[<span class="st">&#39;value1&#39;</span>]</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> request.form[<span class="st">&#39;value2&#39;</span>]</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    operation <span class="op">=</span> <span class="bu">str</span>(request.form[<span class="st">&#39;operation&#39;</span>])</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&#39;add&#39;</span>, <span class="st">&#39;subtract&#39;</span>, <span class="st">&#39;divide&#39;</span>, <span class="st">&#39;multiply&#39;</span>]:</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>,</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>                               printed_result<span class="op">=</span><span class="st">&#39;Invalid operation.&#39;</span>)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>        value1, value2 <span class="op">=</span> convert_to_float(value1, value2)</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;Invalid input&quot;</span>)</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> perform_calculation(value1, value2, operation)</span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>        history.append(<span class="ss">f&quot;</span><span class="sc">{</span>value1<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>operation<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>value2<span class="sc">}</span><span class="ss"> = </span><span class="sc">{</span><span class="bu">round</span>(result, <span class="dv">3</span>)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(<span class="bu">round</span>(result, <span class="dv">3</span>)))</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ZeroDivisionError</span>:</span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;Cannot divide by zero&quot;</span>)</span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/history&#39;</span>)</span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_history():</span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&#39;history.html&#39;</span>, history<span class="op">=</span>history)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>templates/history.html</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17" data-filename="templates/history.html"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;!DOCTYPE</span> html<span class="dt">&gt;</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="dt">&gt;</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">head</span><span class="dt">&gt;</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">title</span><span class="dt">&gt;</span>Calculation History<span class="dt">&lt;/</span><span class="kw">title</span><span class="dt">&gt;</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">head</span><span class="dt">&gt;</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Calculation History<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    {% if history %}</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">ul</span><span class="dt">&gt;</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        {% for entry in history %}</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">li</span><span class="dt">&gt;</span>{{ entry }}<span class="dt">&lt;/</span><span class="kw">li</span><span class="dt">&gt;</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>        {% endfor %}</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">ul</span><span class="dt">&gt;</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    {% else %}</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>No calculations yet.<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    {% endif %}</span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;home&#39;) }}&quot;</span><span class="dt">&gt;</span>Back to calculator<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24" data-filename="templates/history.html"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;!DOCTYPE</span> html<span class="dt">&gt;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="dt">&gt;</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">head</span><span class="dt">&gt;</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">title</span><span class="dt">&gt;</span>Calculation History<span class="dt">&lt;/</span><span class="kw">title</span><span class="dt">&gt;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">head</span><span class="dt">&gt;</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Calculation History<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    {% if history %}</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">ul</span><span class="dt">&gt;</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>        {% for entry in history %}</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">li</span><span class="dt">&gt;</span>{{ entry }}<span class="dt">&lt;/</span><span class="kw">li</span><span class="dt">&gt;</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>        {% endfor %}</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">ul</span><span class="dt">&gt;</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    {% else %}</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>No calculations yet.<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    {% endif %}</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;home&#39;) }}&quot;</span><span class="dt">&gt;</span>Back to calculator<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Add a link to <code>index.html</code> (e.g. below the form):</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>templates/index.html (addition)</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18" data-filename="templates/index.html (addition)"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;show_history&#39;) }}&quot;</span><span class="dt">&gt;</span>View history<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25" data-filename="templates/index.html (addition)"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;show_history&#39;) }}&quot;</span><span class="dt">&gt;</span>View history<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The <code>history</code> list lives in Python’s memory on the server process. Restarting the server creates a fresh process, so the list is re-initialised to <code>[]</code>. In a real application you would persist this data in a permanent store like a database.</p>
 </div>
@@ -3050,7 +3169,7 @@ window.Quarto = {
 </section>
 <section id="exercise-7" class="level3">
 <h3 class="anchored" data-anchor-id="exercise-7">Exercise 7</h3>
-<p>The calculator currently treats all input as floating-point numbers. Add support for <strong>integer mode</strong>, letting the user choose whether to work with integers or floats.</p>
+<p>The calculator currently treats all input as floating-point numbers. Add support for integer mode, letting the user choose whether to work with integers or floats.</p>
 <ul>
 <li>Add a pair of radio buttons to <code>index.html</code> with <code>name=&quot;numtype&quot;</code> and values <code>&quot;float&quot;</code> (checked by default) and <code>&quot;int&quot;</code>.</li>
 <li>In <code>helper.py</code>, write a new function <code>convert_input(value1: str, value2: str, numtype: str)</code> that converts both values to <code>int</code> or <code>float</code> depending on <code>numtype</code>. What happens if the user selects integer mode but enters <code>&quot;3.5&quot;</code>?</li>
@@ -3073,64 +3192,64 @@ window.Quarto = {
 <div class="code-with-filename-file">
 <pre><strong>helper.py</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19" data-filename="helper.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> perform_calculation(value1, value2, operation: <span class="bu">str</span>, integer_mode: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span>):</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Perform a mathematical operation on two values.&quot;&quot;&quot;</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="op">==</span> <span class="st">&#39;add&#39;</span>:</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">+</span> value2</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;subtract&#39;</span>:</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">-</span> value2</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;divide&#39;</span>:</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Use floor division in integer mode so the result stays an integer</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">//</span> value2 <span class="cf">if</span> integer_mode <span class="cf">else</span> value1 <span class="op">/</span> value2</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">*</span> value2</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> convert_to_float(value1: <span class="bu">str</span>, value2: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">tuple</span>[<span class="bu">float</span>, <span class="bu">float</span>]:</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Convert two strings to floating point numbers.&quot;&quot;&quot;</span></span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(value1), <span class="bu">float</span>(value2)</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> convert_input(value1: <span class="bu">str</span>, value2: <span class="bu">str</span>, numtype: <span class="bu">str</span>):</span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Convert two strings to int or float depending on numtype.&quot;&quot;&quot;</span></span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> numtype <span class="op">==</span> <span class="st">&#39;int&#39;</span>:</span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>        <span class="co"># int(&quot;3.5&quot;) raises ValueError -- caught by the caller</span></span>
-<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">int</span>(value1), <span class="bu">int</span>(value2)</span>
-<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(value1), <span class="bu">float</span>(value2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26" data-filename="helper.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> perform_calculation(value1, value2, operation: <span class="bu">str</span>, integer_mode: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span>):</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Perform a mathematical operation on two values.&quot;&quot;&quot;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="op">==</span> <span class="st">&#39;add&#39;</span>:</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">+</span> value2</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;subtract&#39;</span>:</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">-</span> value2</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> operation <span class="op">==</span> <span class="st">&#39;divide&#39;</span>:</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Use floor division in integer mode so the result stays an integer</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">//</span> value2 <span class="cf">if</span> integer_mode <span class="cf">else</span> value1 <span class="op">/</span> value2</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> value1 <span class="op">*</span> value2</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> convert_to_float(value1: <span class="bu">str</span>, value2: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">tuple</span>[<span class="bu">float</span>, <span class="bu">float</span>]:</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Convert two strings to floating point numbers.&quot;&quot;&quot;</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(value1), <span class="bu">float</span>(value2)</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> convert_input(value1: <span class="bu">str</span>, value2: <span class="bu">str</span>, numtype: <span class="bu">str</span>):</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Convert two strings to int or float depending on numtype.&quot;&quot;&quot;</span></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> numtype <span class="op">==</span> <span class="st">&#39;int&#39;</span>:</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>        <span class="co"># int(&quot;3.5&quot;) raises ValueError -- caught by the caller</span></span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">int</span>(value1), <span class="bu">int</span>(value2)</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(value1), <span class="bu">float</span>(value2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>flask_app.py (calculate function)</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20" data-filename="flask_app.py (calculate function)"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/calculate&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;POST&#39;</span>])</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate():</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> request.form[<span class="st">&#39;value1&#39;</span>]</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> request.form[<span class="st">&#39;value2&#39;</span>]</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    operation <span class="op">=</span> <span class="bu">str</span>(request.form[<span class="st">&#39;operation&#39;</span>])</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    numtype <span class="op">=</span> request.form.get(<span class="st">&#39;numtype&#39;</span>, <span class="st">&#39;float&#39;</span>)  <span class="co"># default to float</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&#39;add&#39;</span>, <span class="st">&#39;subtract&#39;</span>, <span class="st">&#39;divide&#39;</span>, <span class="st">&#39;multiply&#39;</span>]:</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>,</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>                               printed_result<span class="op">=</span><span class="st">&#39;Invalid operation.&#39;</span>)</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>        value1, value2 <span class="op">=</span> convert_input(value1, value2, numtype)</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>,</span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>                               printed_result<span class="op">=</span><span class="st">&quot;Invalid input — in integer mode, enter whole numbers only.&quot;</span>)</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>        integer_mode <span class="op">=</span> (numtype <span class="op">==</span> <span class="st">&#39;int&#39;</span>)</span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> perform_calculation(value1, value2, operation, integer_mode<span class="op">=</span>integer_mode)</span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>        history.append(<span class="ss">f&quot;</span><span class="sc">{</span>value1<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>operation<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>value2<span class="sc">}</span><span class="ss"> = </span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(result))</span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ZeroDivisionError</span>:</span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;Cannot divide by zero&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27" data-filename="flask_app.py (calculate function)"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/calculate&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;POST&#39;</span>])</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate():</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> request.form[<span class="st">&#39;value1&#39;</span>]</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> request.form[<span class="st">&#39;value2&#39;</span>]</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    operation <span class="op">=</span> <span class="bu">str</span>(request.form[<span class="st">&#39;operation&#39;</span>])</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    numtype <span class="op">=</span> request.form.get(<span class="st">&#39;numtype&#39;</span>, <span class="st">&#39;float&#39;</span>)  <span class="co"># default to float</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&#39;add&#39;</span>, <span class="st">&#39;subtract&#39;</span>, <span class="st">&#39;divide&#39;</span>, <span class="st">&#39;multiply&#39;</span>]:</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>,</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>                               printed_result<span class="op">=</span><span class="st">&#39;Invalid operation.&#39;</span>)</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>        value1, value2 <span class="op">=</span> convert_input(value1, value2, numtype)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>,</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>                               printed_result<span class="op">=</span><span class="st">&quot;Invalid input — in integer mode, enter whole numbers only.&quot;</span>)</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>        integer_mode <span class="op">=</span> (numtype <span class="op">==</span> <span class="st">&#39;int&#39;</span>)</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> perform_calculation(value1, value2, operation, integer_mode<span class="op">=</span>integer_mode)</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>        history.append(<span class="ss">f&quot;</span><span class="sc">{</span>value1<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>operation<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>value2<span class="sc">}</span><span class="ss"> = </span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(result))</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ZeroDivisionError</span>:</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="st">&quot;Cannot divide by zero&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Add radio buttons to the form in <code>index.html</code>:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>templates/index.html (addition inside the form)</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21" data-filename="templates/index.html (addition inside the form)"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">label</span><span class="dt">&gt;&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;radio&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;numtype&quot;</span><span class="ot"> value</span><span class="op">=</span><span class="st">&quot;float&quot;</span><span class="ot"> checked</span><span class="dt">&gt;</span> Float<span class="dt">&lt;/</span><span class="kw">label</span><span class="dt">&gt;</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">label</span><span class="dt">&gt;&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;radio&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;numtype&quot;</span><span class="ot"> value</span><span class="op">=</span><span class="st">&quot;int&quot;</span><span class="dt">&gt;</span> Integer<span class="dt">&lt;/</span><span class="kw">label</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28" data-filename="templates/index.html (addition inside the form)"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">label</span><span class="dt">&gt;&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;radio&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;numtype&quot;</span><span class="ot"> value</span><span class="op">=</span><span class="st">&quot;float&quot;</span><span class="ot"> checked</span><span class="dt">&gt;</span> Float<span class="dt">&lt;/</span><span class="kw">label</span><span class="dt">&gt;</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">label</span><span class="dt">&gt;&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;radio&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;numtype&quot;</span><span class="ot"> value</span><span class="op">=</span><span class="st">&quot;int&quot;</span><span class="dt">&gt;</span> Integer<span class="dt">&lt;/</span><span class="kw">label</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -3230,90 +3349,90 @@ window.Quarto = {
 <div class="code-with-filename-file">
 <pre><strong>rpn.py</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22" data-filename="rpn.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> evaluate_rpn(expression: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Evaluate a Reverse Polish Notation expression using a stack.&quot;&quot;&quot;</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    stack <span class="op">=</span> []</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    operators <span class="op">=</span> {<span class="st">&#39;+&#39;</span>, <span class="st">&#39;-&#39;</span>, <span class="st">&#39;*&#39;</span>, <span class="st">&#39;/&#39;</span>}</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> token <span class="kw">in</span> expression.split():</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> token <span class="kw">in</span> operators:</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">len</span>(stack) <span class="op">&lt;</span> <span class="dv">2</span>:</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f&quot;Not enough operands for operator &#39;</span><span class="sc">{</span>token<span class="sc">}</span><span class="ss">&#39;&quot;</span>)</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>            b <span class="op">=</span> stack.pop()</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>            a <span class="op">=</span> stack.pop()</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> token <span class="op">==</span> <span class="st">&#39;+&#39;</span>:</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>                stack.append(a <span class="op">+</span> b)</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> token <span class="op">==</span> <span class="st">&#39;-&#39;</span>:</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>                stack.append(a <span class="op">-</span> b)</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> token <span class="op">==</span> <span class="st">&#39;*&#39;</span>:</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>                stack.append(a <span class="op">*</span> b)</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> token <span class="op">==</span> <span class="st">&#39;/&#39;</span>:</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> b <span class="op">==</span> <span class="dv">0</span>:</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&quot;Division by zero&quot;</span>)</span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>                stack.append(a <span class="op">/</span> b)</span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">try</span>:</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>                stack.append(<span class="bu">float</span>(token))</span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f&quot;&#39;</span><span class="sc">{</span>token<span class="sc">}</span><span class="ss">&#39; is not a valid number or operator&quot;</span>)</span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(stack) <span class="op">!=</span> <span class="dv">1</span>:</span>
-<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f&quot;Invalid expression: </span><span class="sc">{</span><span class="bu">len</span>(stack)<span class="sc">}</span><span class="ss"> value(s) left on the stack&quot;</span>)</span>
-<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> stack[<span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29" data-filename="rpn.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> evaluate_rpn(expression: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Evaluate a Reverse Polish Notation expression using a stack.&quot;&quot;&quot;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    stack <span class="op">=</span> []</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    operators <span class="op">=</span> {<span class="st">&#39;+&#39;</span>, <span class="st">&#39;-&#39;</span>, <span class="st">&#39;*&#39;</span>, <span class="st">&#39;/&#39;</span>}</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> token <span class="kw">in</span> expression.split():</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> token <span class="kw">in</span> operators:</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">len</span>(stack) <span class="op">&lt;</span> <span class="dv">2</span>:</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f&quot;Not enough operands for operator &#39;</span><span class="sc">{</span>token<span class="sc">}</span><span class="ss">&#39;&quot;</span>)</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>            b <span class="op">=</span> stack.pop()</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>            a <span class="op">=</span> stack.pop()</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> token <span class="op">==</span> <span class="st">&#39;+&#39;</span>:</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>                stack.append(a <span class="op">+</span> b)</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> token <span class="op">==</span> <span class="st">&#39;-&#39;</span>:</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>                stack.append(a <span class="op">-</span> b)</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> token <span class="op">==</span> <span class="st">&#39;*&#39;</span>:</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>                stack.append(a <span class="op">*</span> b)</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> token <span class="op">==</span> <span class="st">&#39;/&#39;</span>:</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> b <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&quot;Division by zero&quot;</span>)</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>                stack.append(a <span class="op">/</span> b)</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">try</span>:</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>                stack.append(<span class="bu">float</span>(token))</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f&quot;&#39;</span><span class="sc">{</span>token<span class="sc">}</span><span class="ss">&#39; is not a valid number or operator&quot;</span>)</span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(stack) <span class="op">!=</span> <span class="dv">1</span>:</span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f&quot;Invalid expression: </span><span class="sc">{</span><span class="bu">len</span>(stack)<span class="sc">}</span><span class="ss"> value(s) left on the stack&quot;</span>)</span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> stack[<span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>flask_app.py (addition)</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23" data-filename="flask_app.py (addition)"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> helper <span class="im">import</span> perform_calculation, convert_to_float, convert_input</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rpn <span class="im">import</span> evaluate_rpn</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/rpn&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;GET&#39;</span>, <span class="st">&#39;POST&#39;</span>])</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rpn():</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    error <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> request.method <span class="op">==</span> <span class="st">&#39;POST&#39;</span>:</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>        expression <span class="op">=</span> request.form[<span class="st">&#39;expression&#39;</span>]</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> evaluate_rpn(expression)</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>            history.append(<span class="ss">f&quot;RPN: </span><span class="sc">{</span>expression<span class="sc">}</span><span class="ss"> = </span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> <span class="pp">ValueError</span> <span class="im">as</span> e:</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>            error <span class="op">=</span> <span class="bu">str</span>(e)</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&#39;rpn.html&#39;</span>, result<span class="op">=</span>result, error<span class="op">=</span>error)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30" data-filename="flask_app.py (addition)"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> helper <span class="im">import</span> perform_calculation, convert_to_float, convert_input</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rpn <span class="im">import</span> evaluate_rpn</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/rpn&#39;</span>, methods<span class="op">=</span>[<span class="st">&#39;GET&#39;</span>, <span class="st">&#39;POST&#39;</span>])</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rpn():</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    error <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> request.method <span class="op">==</span> <span class="st">&#39;POST&#39;</span>:</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>        expression <span class="op">=</span> request.form[<span class="st">&#39;expression&#39;</span>]</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> evaluate_rpn(expression)</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>            history.append(<span class="ss">f&quot;RPN: </span><span class="sc">{</span>expression<span class="sc">}</span><span class="ss"> = </span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> <span class="pp">ValueError</span> <span class="im">as</span> e:</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>            error <span class="op">=</span> <span class="bu">str</span>(e)</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> render_template(<span class="st">&#39;rpn.html&#39;</span>, result<span class="op">=</span>result, error<span class="op">=</span>error)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>templates/rpn.html</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24" data-filename="templates/rpn.html"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;!DOCTYPE</span> html<span class="dt">&gt;</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="dt">&gt;</span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">head</span><span class="dt">&gt;</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">title</span><span class="dt">&gt;</span>RPN Calculator<span class="dt">&lt;/</span><span class="kw">title</span><span class="dt">&gt;</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">head</span><span class="dt">&gt;</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>RPN Calculator<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>Enter a space-separated Reverse Polish Notation expression, e.g. <span class="dt">&lt;</span><span class="kw">code</span><span class="dt">&gt;</span>5 1 2 + 4 * + 3 -<span class="dt">&lt;/</span><span class="kw">code</span><span class="dt">&gt;&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> action</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;rpn&#39;) }}&quot;</span><span class="ot"> method</span><span class="op">=</span><span class="st">&quot;post&quot;</span><span class="dt">&gt;</span></span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;expression&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;e.g. 3 4 +&quot;</span><span class="ot"> style</span><span class="op">=</span><span class="st">&quot;width: 300px;&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">button</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;submit&quot;</span><span class="dt">&gt;</span>Evaluate<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">br</span><span class="dt">&gt;</span></span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    {% if result is not none %}</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>Result: {{ result }}<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    {% endif %}</span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    {% if error %}</span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>Error: {{ error }}<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>    {% endif %}</span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;home&#39;) }}&quot;</span><span class="dt">&gt;</span>Back to calculator<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31" data-filename="templates/rpn.html"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;!DOCTYPE</span> html<span class="dt">&gt;</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="dt">&gt;</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">head</span><span class="dt">&gt;</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">title</span><span class="dt">&gt;</span>RPN Calculator<span class="dt">&lt;/</span><span class="kw">title</span><span class="dt">&gt;</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">head</span><span class="dt">&gt;</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>RPN Calculator<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>Enter a space-separated Reverse Polish Notation expression, e.g. <span class="dt">&lt;</span><span class="kw">code</span><span class="dt">&gt;</span>5 1 2 + 4 * + 3 -<span class="dt">&lt;/</span><span class="kw">code</span><span class="dt">&gt;&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> action</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;rpn&#39;) }}&quot;</span><span class="ot"> method</span><span class="op">=</span><span class="st">&quot;post&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;expression&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;e.g. 3 4 +&quot;</span><span class="ot"> style</span><span class="op">=</span><span class="st">&quot;width: 300px;&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">button</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;submit&quot;</span><span class="dt">&gt;</span>Evaluate<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">br</span><span class="dt">&gt;</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>    {% if result is not none %}</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>Result: {{ result }}<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>    {% endif %}</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>    {% if error %}</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>Error: {{ error }}<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>    {% endif %}</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;home&#39;) }}&quot;</span><span class="dt">&gt;</span>Back to calculator<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Add a link in <code>index.html</code>:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>templates/index.html (addition)</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25" data-filename="templates/index.html (addition)"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;rpn&#39;) }}&quot;</span><span class="dt">&gt;</span>RPN calculator<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32" data-filename="templates/index.html (addition)"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;rpn&#39;) }}&quot;</span><span class="dt">&gt;</span>RPN calculator<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
