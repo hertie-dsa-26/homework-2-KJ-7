@@ -1,0 +1,933 @@
+---
+title: Lab 4
+---
+
+# Overview
+
+## Today
+
+- [Coding workflows](#workflows)
+    - [Type Hints](#type-hints)
+    - [Exception Handling](#exceptions)
+- [Dynamic web apps with Flask](#dynamic)
+- [A Dynamic Flask example: a calculator](#example)
+- [Deploying your Flask app](#deployment)
+- [Exercises](#exercises)
+
+## Learning Objectives
+
+By completing this lab, you will be able to:
+
+1. Distinguish between static and dynamic web applications
+2. Create Flask routes that accept user input via URL parameters
+3. Build HTML forms that submit data to Flask using POST requests
+4. Deploy a Flask application to PythonAnywhere
+5. Handle user input errors with `try`/`except` blocks
+6. Refactor code into separate modules for better organisation
+
+# Refresher on Coding Workflows {#workflows}
+
+## The Terminal
+
+The **terminal** (also referred to as the **shell**, **command line**, or **command line interface (CLI)**) is a text-based interface for interacting with your computer. Instead of clicking icons, you type commands.
+
+The terminal inside your IDE is the same as the terminal outside it. When you open a terminal tab in VS Code or another editor, it is not a special IDE-specific terminal. The terminal tab launches a real shell, identical to the one you open from your Applications folder (macOS) or Start menu (Windows). Any command that works in one works in the other. One difference is that the IDE terminal typically opens with the current working directory set to the folder open in the file exploration tab.
+
+An important concept is the **current working directory (CWD)**, which is the folder the terminal is currently "in". Every command you run executes relative to this directory. When you run `uv run flask --app flask_app run`, for example, `uv` starts looking for `pyproject.toml` from the CWD. You can print the CWD with `pwd` or `echo $PWD` on macOS or Linux and with `cd` with no arguments on Windows.
+
+To change the CWD, use the change directory command `cd`:
+
+- `cd my_project` — move into the `my_project` subdirectory of the CWD.
+- `cd ..` — move up one level to the parent directory.
+- `cd /Users/yourname/Documents/my_project` — move to an absolute path, regardless of where you currently are.
+
+Paths beginning with `/` are absolute. Otherwise they are relative.
+
+Before running any project command (`uv run`, `flask`, `python`, etc), make sure that you are in the right directory. Similarly, if terminal commands aren't working for you, double check the current working directory.
+
+You can print the contents of the current working directory (CWD) with the `ls` (macOS/Linux) or `dir` (Windows) commands.
+
+## Virtual Environments and `uv`
+
+Virtual environments help you isolate the Python packages (and their versions) that you need for a certain project from those you need for a different one. This course uses `uv` for package management.
+
+With `uv`, virtual environments are local to each project directory — rather than a global folder of named environments (as with `conda`), `uv` creates a `.venv` folder inside your project. You do not need to activate it manually as `uv run` handles this for you.
+
+Commands we've used include:
+
+- `uv init`: Initializes a new project in the CWD, creating a `pyproject.toml` (which tracks your project's dependencies and Python version) and a `uv.lock` file (which pins exact versions for reproducibility).
+- `uv add <package>`: Adds a dependency to the project and records it in `pyproject.toml`, resolves and pins it in `uv.lock`, and installs it into the virtual environment (`.venv`). This also runs `uv sync` automatically.
+- `uv sync`: Reads `pyproject.toml` and `uv.lock` and brings the virtual environment (`.venv`) into alignment by installing anything missing and removing anything no longer listed. You rarely need to run this manually, since `uv run`, `uv add`, and `uv remove` trigger it automatically.
+- `uv run <command>`: Runs `uv sync` to ensure the environment is up to date, then executes the command inside the managed environment. Use this wherever you would otherwise type `python` or `flask` directly (e.g. `uv run flask --app flask_app run`).
+
+When you run `uv run`, it walks up the directory tree from the CWD until it finds a `pyproject.toml`, meaning it will locate the correct project even if you are inside a subdirectory (e.g. inside `templates/`).
+
+You can ignore the `.venv` folder — it is where `uv` installs Python and packages. Keep your own project files (`flask_app.py`, `templates/`, etc.) in the project root.
+
+## Jupyter notebooks vs Python modules (and IDEs)
+
+**Jupyter notebooks** (files with the `.ipynb` extension) are best for code exploration and for displaying code alongside markdown text. They store metadata about execution and are fundamentally JSON files (and therefore painful to version control without additional tooling).
+
+**Python modules** (files with the `.py` extension) are where you write the functions and classes that will be reused later on (e.g. as part of a data science project, a web app, or even a Jupyter notebook). They can also be executable scripts.
+
+## Importing Python Modules
+
+One major reason to use `.py` files instead of notebooks is that you can **import** them (without going crazy). When Python executes `import helper` (or `from helper import some_function`), it looks for a file called `helper.py` in a set of locations, starting with the directory of the file doing the importing. If `flask_app.py` and `helper.py` are in the same folder, `from helper import perform_calculation` works with no additional configuration.
+
+```bash
+my_project/
+  - flask_app.py
+  - helper.py
+```
+
+The `import` statement runs the imported file, makes its imported names available in the current namespace, and caches the result. Using the example above, `perform_calculation` is the name added to the current namespace.
+
+A few conventions to be aware of:
+
+- **Module names** are the filename without the `.py` extension. `helper.py` is imported as `helper`.
+- Avoid naming your files after standard library modules or installed packages (e.g. do not call a file `math.py` or `flask.py`), as this will shadow the real module and cause confusing import errors.
+- The `if __name__ == '__main__':` guard is used to write code that only runs when the file is executed directly (e.g. `uv run python helper.py`), not when it is imported. This is useful for putting quick tests or a `main()` call at the bottom of a module without affecting other files that import it. This is also used for writing Python scripts that will be called from the command line.
+
+## Type Hints {#type-hints}
+
+Python is a **dynamically typed** language, which means variables do not have a fixed **type**. The same variable can hold a string one moment and an integer the next, and Python only checks types at runtime. **Type hints** (also called **type annotations**) are an optional way to document the expected types of function parameters and return values directly in the code. Type hints/annotations are added after parameters using colons (`:`) and after a function definition using `->`.
+
+For example:
+
+```python
+def add(x: float, y: float) -> float:
+    return x + y
+```
+
+`x: float` and `y: float` say that `x` and `y` should be floats. The `-> float` says the function returns a float. The `:` syntax annotates a parameter, and `->` annotates the return type.
+
+Type hints have no effect at runtime. Python does not enforce them or raise errors when you pass the wrong type. Their value is as **documentation** and as input to **static analysis** tools:
+
+- Your IDE (e.g. VS Code with the Pylance extension) will underline type mismatches as you type.
+- Tools like `ty` can check your entire codebase for type errors before you run it.
+- Other developers (and your future self) can read a function signature and immediately know what it expects and returns, without reading the body.
+
+### Common types
+
+The built-in types you will use most often are `int`, `float`, `str`, and `bool`. For functions that return nothing, the return type is `None`:
+
+```python
+def greet(name: str) -> None:
+    print(f"Hello, {name}!")
+```
+
+For functions that return multiple values as a tuple, use `tuple`:
+
+```python
+def min_max(values: list) -> tuple:
+    return min(values), max(values)
+```
+
+## Exception Handling {#exceptions}
+
+When Python encounters an error it cannot recover from automatically, such as dividing by zero, converting `"hello"` to a number, or accessing a dictionary key that does not exist, it raises an **exception**. An exception is an object that describes the error. If your code does not handle it, Python prints a **traceback** (a description of the call stack at the point the error occurred) and terminates the program:
+
+```python
+Traceback (most recent call last):
+  File "app.py", line 3, in <module>
+    result = 1 / 0
+ZeroDivisionError: division by zero
+```
+
+The last line of a traceback always names the exception type and gives a message. Learning to read tracebacks is one of the most valuable debugging skills you can develop.
+
+### Common built-in exceptions
+
+| Exception | Raised when |
+|---|---|
+| `ValueError` | A function receives an argument of the right type but an invalid value (e.g. `int("hello")`) |
+| `ZeroDivisionError` | The right-hand side of a `/` or `//` operation is zero |
+| `TypeError` | An operation is applied to an object of the wrong type (e.g. `"3" + 3`) |
+| `KeyError` | A dictionary is accessed with a key that does not exist |
+| `IndexError` | A list is accessed with an index that is out of range |
+
+### `try` and `except`
+
+To handle an exception without crashing the program, wrap the code that you expect to potentially fail in a `try` block and add one or more `except` clauses that describe what to do if a particular exception occurs:
+
+```python
+try:
+    value = float(user_input)
+    result = 10 / value
+except ValueError:
+    print("That is not a valid number.")
+except ZeroDivisionError:
+    print("Cannot divide by zero.")
+```
+
+Python executes the `try` block line by line. If an exception is raised, it immediately stops and looks for a matching `except` clause. If one matches, that clause is executed and then execution continues normally after the whole `try`/`except` block. If no clause matches, the exception propagates up the call stack as normal.
+
+You should always catch **specific** exception types rather than using a bare `except:` with no type. A bare `except` catches everything, including `KeyboardInterrupt` (i.e. pressing Ctrl-C) and programming mistakes you did not anticipate, which makes bugs much harder to find.
+
+### `raise`
+
+You can signal an error from your own code with the `raise` statement:
+
+```python
+def safe_divide(a: float, b: float) -> float:
+    if b == 0:
+        raise ValueError("Denominator cannot be zero")
+    return a / b
+```
+
+`raise` followed by an exception instance (or class) immediately halts the current function and propagates the exception to the caller. The caller can then catch it with `except`. If it's not caught, it ends execution and triggers the traceback.
+
+You can include `as e` in an `except` clause to capture the exception. `as e` binds the exception object to the name `e`, so you can access its message with `str(e)`. This is useful for printing exceptions to console or log.
+
+### `else` and `finally`
+
+Two optional clauses extend the `try`/`except` structure:
+
+- `else`: runs only if the `try` block completed without raising any exception. Useful for code that should only run on success.
+- `finally`: always runs, whether or not an exception occurred. Typically used for cleanup (closing files, releasing locks).
+
+```python
+try:
+    result = perform_calculation(value1, value2, operation)
+except ZeroDivisionError:
+    print("Cannot divide by zero.")
+else:
+    print(f"Result: {result}")  # only runs if no exception
+finally:
+    print("Calculation attempt complete.")  # always runs
+```
+
+# Dynamic Web Apps with Flask {#dynamic}
+
+Every website follows the same basic pattern: your browser sends a **request** to a server, and the server sends back a **response** — typically an HTML file that the browser then renders. What differs between static and dynamic sites is how the server produces that HTML.
+
+## Static websites
+
+With a **static** website, the HTML files are prepared in advance and stored on the server as-is. When a visitor requests a page, the server simply retrieves the corresponding file and sends it--no computation happens at request time. Every visitor who requests the same URL receives exactly the same file.
+
+This is how the labs you are reading right now work. `uv run quarto render` renders `.qmd` source files into HTML once at build time, and the resulting HTML files are served directly. The server has no idea who you are or what you have done before.
+
+Pros:
+
+- Easy to host: any server that can serve files works, including free platforms like GitHub Pages.
+- Fast: the server does no work per request.
+- Simple: no backend code to write or maintain.
+- Cheap: You can serve static content to huge numbers of people at very low to zero cost using **content delivery networks (CDNs)** like CloudFlare.
+
+Cons:
+
+- Every page has to be written (or generated) before it is published, meaning that updating content requires rebuilding and redeploying.
+- No personalisation: all visitors see the same content regardless of who they are or what they have done.
+- No interactivity that depends on the server: a contact form, a login page, or a search box that queries a database are not possible without a backend.
+
+## Dynamic websites
+
+With a **dynamic** website, the server generates the HTML *at request time*, just before sending it to the browser. The server runs code (Python, Ruby, PHP, C#, etc) to produce an HTML response tailored to that specific request. The response can be built using information like what the user submitted in a form, who they are logged in as, and what is currently in a database.
+
+The sequence for a dynamic request looks like this:
+
+1. The browser sends a request to the server (e.g. `GET /profile/JACKSONMLUCKEY`).
+2. The server receives the request and runs backend code — looks up user `"JACKSONMLUCKEY"` in the database, formats their data, etc.
+3. The backend code fills a template with the resulting data to produce an HTML string.
+4. The server sends that HTML string back to the browser.
+5. The browser renders it.
+
+Step 3 is the key one: the HTML does not exist until someone requests it. Two different users requesting `/profile/JACKSONMLUCKEY` and `/profile/SOMEPERSON` get different HTML back, generated from the same template but with different data.
+
+Pros:
+
+- Personalisation: each response can be tailored to the user or their input.
+- Content can be managed in a database and updated without touching HTML files.
+- The same URL can serve different content depending on state (logged in vs. logged out, search query, etc.).
+
+Cons:
+
+- More moving parts: a backend language, possibly a database, and a server capable of running code. This rules out most free hosting options.
+- Each request involves computation, so it is potentially slower than serving a static file — though in practice this is rarely noticeable for small apps.
+
+## Flask and dynamic websites
+
+**Flask** is a lightweight Python framework used to build dynamic websites. Under the hood it is built on two libraries: **Werkzeug**, which receives and parses raw HTTP requests, and **Jinja2**, which renders HTML templates with dynamic data. Flask itself ships with just the essentials (routing, request handling, and templating).
+
+The core Flask conventions are:
+
+- **Routes**: a route maps a URL pattern to a Python function, registered with the `@app.route(...)` **decorator**. When Flask receives a request, it scans its routing table for a matching URL and calls the associated function.
+- **View functions**: the Python function attached to a route. Its return value becomes the HTTP response sent back to the browser — you can return plain text, HTML strings, or rendered templates.
+- **Templates**: HTML files that Flask processes using Jinja2 before sending to the browser, filling in dynamic data passed from the view function. Flask expects templates to live in a `templates/` folder in the same directory as your app file.
+
+# A Dynamic Flask example: a calculator {#example}
+
+Let's create a new Flask app, this time with slightly more advanced user input and functionality: a basic calculator.
+
+## Setting up
+
+1. Create a new project directory, e.g. called `calculator_app`, and navigate into it using your IDE and/or terminal. This is where you will create `flask_app.py` and your `templates` folder.
+
+    ```bash
+    calculator_app/
+      |-- flask_app.py
+      |-- templates/
+    ```
+
+    - Like last week, the main file must be named `flask_app.py`.
+
+2. Initialise a new `uv` project and add Flask:
+
+    ```bash
+    uv init --bare
+    uv add flask
+    ```
+
+    - The `--bare` skips creating a `main.py` and `README` which we don't need for now.
+
+3. Update `flask_app.py` to include the following starter code. Include `render_template` and `request` in the import now — you will need them later:
+
+    ```{.python filename="flask_app.py"}
+    from flask import Flask, render_template, request
+
+    app = Flask(__name__)  # create the application object
+
+    @app.route('/')
+    def home():
+        return 'Home page'
+    ```
+
+    - `Flask(__name__)` creates the application object. `__name__` tells Flask where to find resources like templates relative to this file.
+    - The `@app.route('/')` decorator registers `home()` in Flask's routing table. When someone visits `/`, Flask calls `home()` and sends its return value as the response body.
+
+4. Run the app by:
+
+    - Navigate to the `calculator_app` directory in the command line.
+    - Run `uv run flask --app flask_app run` (where the importance of the file name `flask_app.py` comes in).
+    - Open `http://127.0.0.1:5000` in a browser.
+
+## Adding dynamic elements
+
+### Static example
+
+Change the `home` function to show the result of a calculation:
+
+```{.python filename="flask_app.py"}
+@app.route('/')
+def home():
+    value1 = 3
+    value2 = 4
+    result = value1 + value2
+    return str(result)
+```
+
+Save the module and refresh the browser. What does it show?
+
+### Dynamic example
+
+Make the app dynamic by letting the user pass variables in the URL:
+
+```{.python filename="flask_app.py"}
+@app.route('/<value1>_<value2>')
+def home(value1, value2):
+    value1 = float(value1)
+    value2 = float(value2)
+    return str(value1 + value2)  # float is not a valid response type; convert to string
+```
+
+Angle brackets in a route pattern (e.g. `<value1>`) delineate **URL variables**. Flask extracts whatever string appears at that position in the URL and passes it as an argument to the view function. With our current `home` view function, visiting `http://127.0.0.1:5000/3.0_4.5` would call `home(value1='3.0', value2='4.5')`, and visiting `http://127.0.0.1:5000/10_20` would call `home(value1='10', value2='20')`. All URL variables are captured as strings by default; you can add a type converter like `<float:value1>` to have Flask **validate** and **convert** the value before passing it to the function. If you want a recap, see lab 03.
+
+The variable names in the route (`<value1>`, `<value2>`) must match the parameter names in the **function signature**. A function's signature is the function's name combined with its parameter list. For example, the signature of `def home(value1, value2):` is `home(value1, value2)`. Flask uses the signature to know which URL segment maps to which argument when calling the function.
+
+Next, let the user choose the operation (for now, allowing only addition):
+
+```{.python filename="flask_app.py"}
+@app.route('/<value1>_<operation>_<value2>')
+def home(value1, operation, value2):
+    value1 = float(value1)
+    value2 = float(value2)
+    if operation == 'addition':
+        return str(value1 + value2)
+    else:
+        return 'Operation must be "addition"'
+```
+
+Note: We could have done `/<float:value1>_<operation>_<float:value2>` to have Flask validate and convert `value1` and `value2` for us.
+
+## Accepting form input
+
+When building dynamic web applications, we need to allow users to interact with the app, providing input to trigger calculations or actions. The goal here is to let users enter values (numbers and an operation) into an HTML **form**, press a button, and see the result of a calculation.
+
+To achieve this, we'll use **form elements** in our frontend **HTML templates**, which allow users to submit their input to the server. The server carries out the calculations defined in the backend Flask logic.
+
+### HTML form
+
+An HTML **form** is a section of a page that collects input from the user and sends it to a server when the user clicks a submit button. A form groups together one or more input fields (e.g. text boxes, drop-downs, checkboxes, etc), where each input field is identified by a `name` attribute. When the user submits the form, the browser packages all the named input values together and sends them to the URL specified in the form's `action` attribute, using the HTTP method specified in `method`.
+
+Create a `templates` folder inside your project root, then create an `index.html` file within it:
+
+```{.html filename="templates/index.html"}
+<!DOCTYPE html>
+<html>
+<head>
+<title>Flask Calculator</title>
+</head>
+
+<body>
+    <h1>Calculator</h1>
+
+    <form action="{{ url_for('calculate') }}" method="post">
+        <input type="text" name="value1" placeholder="Enter the first number" required="required" />
+        <input type="text" name="value2" placeholder="Enter the second number" required="required" />
+        <input type="text" name="operation" placeholder="addition" required="required" />
+        <button type="submit">Calculate</button>
+    </form>
+
+<br>
+
+{{ printed_result }}
+
+</body>
+</html>
+```
+
+The `action` attribute specifies the URL that the form data is sent to when the user clicks submit. `url_for('calculate')` is a Flask function that generates a URL from a view function's name--in this case, resolving the `calculate` view function to the `/calculate` route. Using `url_for` rather than hard-coding `/calculate` means the URL stays correct even if you restructure your routes.
+
+The `method` attribute specifies which **HTTP method** to use. HTTP methods convey the *intent* of a request: **GET** means "retrieve this resource", **POST** means "submit data to be processed". When a form uses **POST**, the browser packages the form fields into the request body, keeping them out of the URL and out of the browser's address bar and history. This is the conventional choice when the submission causes something to happen on the server (e.g. a calculation, creating an account, posting a comment). **GET** appends the form data to the URL as query parameters (e.g. `/search?q=flask&page=2`), which makes the request bookmarkable and shareable, which is appropriate and often desirable for read-only operations like searches. By default, Flask routes only accept GET requests, so we need to add `methods=['POST']` to the route decorator to allow POST.
+- The `name` tags on each input determine how the data is labelled when it reaches the server. For example, `name="value1"` means Flask will access this field using `request.form['value1']` when the form is submitted.
+
+### Flask logic
+
+Update `flask_app.py` to handle the form submission:
+
+```{.python filename="flask_app.py"}
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+
+@app.route('/calculate', methods=['POST'])  # associate the POST method with this route
+def calculate():
+    # retrieve values sent to the server via POST
+    value1 = request.form['value1']
+    value2 = request.form['value2']
+    operation = str(request.form['operation'])
+
+    # convert input to floating point
+    value1 = float(value1)
+    value2 = float(value2)
+
+    if operation == 'addition':
+        return render_template('index.html', printed_result=str(value1 + value2))
+    else:
+        return render_template('index.html', printed_result='Operation must be "addition"')
+```
+
+`request` is a Flask object that contains everything about the incoming HTTP request. `request.form` is a dictionary-like object populated with the form fields from a POST submission, accessible by each input's `name` attribute (e.g. `value1` and `value2` in our case).
+
+`render_template('index.html', printed_result=...)` finds `templates/index.html`, fills in the `{{ printed_result }}` Jinja2 placeholder with the value you pass, and returns the resulting HTML. Any keyword argument you pass to `render_template` becomes a variable available inside the Jinja2 template.
+
+# How to deploy your Flask app? {#deployment}
+
+## What deployment means
+
+So far, your app has been running on your own machine: Flask's development server listens for requests on `localhost` (i.e. `127.0.0.1:5000`), and only your browser can reach it. **Deploying** an app means moving it to a server that is permanently connected to the internet, so anyone with the URL can visit it at any time.
+
+There are a few important differences between running locally and deploying:
+
+- The server runs continuously: A remote server does not shut down when you close your laptop — it keeps running and accepting requests.
+- Flask's development server is not suitable for production: Werkzeug's built-in server is single-threaded and not hardened for security or designed for operating under load. In a real deployment, a dedicated WSGI server (such as Gunicorn or uWSGI) sits in front of your Flask app and handles the actual HTTP traffic.
+- Your code needs to be on the remote machine: The server cannot run code that only exists on your laptop; you have to upload your files to the hosting platform.
+
+One option for deploying a toy app is [PythonAnywhere](https://www.pythonanywhere.com/), a hosting platform designed for Python web apps, which has a completely free tier. PythonAnywhere provides a Linux server, a public domain (`yourusername.pythonanywhere.com`), and configures a WSGI server in front of your Flask app automatically, so you only need to upload your code.
+
+## Create your web app on PythonAnywhere
+
+- Create a free PythonAnywhere account and log in.
+- Go to the Web menu item and press Add new web app.
+- Click Next, then click on the Flask option and finally choose the latest version of Python in the list.
+- You will now see the PythonAnywhere project path — accept the default by clicking Next.
+- In your browser, visit `https://yourusername.pythonanywhere.com` (replacing `yourusername` with your actual PythonAnywhere username).
+
+## Upload your project
+
+- Go to the Web menu and scroll down to the Code section. Click Go to directory next to where it says Source code.
+- This takes you to the Files section of PythonAnywhere. Delete the `flask_app.py` file that is there by default.
+- Use the Upload a file button to upload your own `flask_app.py` file. The file must be named exactly `flask_app.py`: PythonAnywhere's WSGI configuration references this filename by convention.
+- On the left, under Directories, enter the name `templates` into the box and press New directory.
+- Upload the `index.html` file into this directory.
+- Go back to the Web menu and click Reload `https://yourusername.pythonanywhere.com`.
+- Send the link to your friends and relatives to make them proud of how far you've come.
+
+# Exercises {#exercises}
+
+Make sure you've done the stuff we've already finished in the "lecture" part of the lab before you begin.
+
+### Exercise 1
+
+Let's build on the calculator app. Extend the functionality to subtraction, multiplication, and division in addition to addition. Include a mechanism that prints a warning message when an invalid operation is entered.
+
+Note: To update the deployed website later, you can simply replace the files you uploaded to PythonAnywhere.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+The `calculate` function in your `flask_app.py` file should look something like this:
+
+```{.python filename="flask_app.py"}
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    value1 = request.form['value1']
+    value2 = request.form['value2']
+    operation = str(request.form['operation'])
+
+    value1 = float(value1)
+    value2 = float(value2)
+
+    if operation == 'add':
+        result = value1 + value2
+    elif operation == 'subtract':
+        result = value1 - value2
+    elif operation == 'divide':
+        result = value1 / value2
+    elif operation == 'multiply':
+        result = value1 * value2
+    else:
+        return render_template('index.html',
+                               printed_result='Operation must be one of "add", "subtract", "divide", or "multiply".')
+    return render_template('index.html', printed_result=str(result))
+```
+:::
+
+### Exercise 2
+
+Turn the text field used to type in the operation into a drop-down menu. Use the `<select>` form element from this [resource](https://www.w3schools.com/html/html_form_elements.asp).
+
+Hint: the values of form elements get sent to the server according to the `name` tag, so make sure you set `name="operation"` in the HTML code for the drop-down.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+Your `index.html` file should look something like this:
+
+```{.html filename="templates/index.html"}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Flask Calculator</title>
+</head>
+<body>
+    <h1>Calculator</h1>
+    <form action="{{ url_for('calculate')}}" method="post">
+        <input type="text" name="value1" placeholder="Enter the first number" required="required" />
+        <input type="text" name="value2" placeholder="Enter the second number" required="required" />
+        <label for="operation">Operation</label>
+        <select id="operation" name="operation">
+            <option value="add">Add</option>
+            <option value="subtract">Subtract</option>
+            <option value="divide">Divide</option>
+            <option value="multiply">Multiply</option>
+        </select>
+        <button type="submit">Calculate</button>
+    </form>
+   <br>
+   {{ printed_result }}
+</body>
+</html>
+```
+:::
+
+### Exercise 3
+
+What kinds of problems could you run into with this calculator? Improve your code to handle them using exception handling (see the [Exception Handling](#exceptions) section above).
+
+Hint: go through the lines of code in your `calculate` function and think about what could go wrong. One problem is related to the type of value a user might enter; another is related to one of the operations.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+Two main problems:
+
+1. `ValueError`: the user enters non-numeric text (can't convert to `float`)
+2. `ZeroDivisionError`: the user tries to divide by zero
+
+```{.python filename="flask_app.py"}
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    value1 = request.form['value1']
+    value2 = request.form['value2']
+    operation = str(request.form['operation'])
+
+    if operation not in ['add', 'subtract', 'divide', 'multiply']:
+        return render_template('index.html',
+                               printed_result='Operation must be one of "add", "subtract", "divide", or "multiply".')
+    try:
+        value1 = float(value1)
+        value2 = float(value2)
+        if operation == 'add':
+            result = value1 + value2
+        elif operation == 'subtract':
+            result = value1 - value2
+        elif operation == 'divide':
+            result = value1 / value2
+        else:
+            result = value1 * value2
+        return render_template('index.html', printed_result=str(result))
+    except ZeroDivisionError:
+        return render_template('index.html', printed_result="You cannot divide by zero")
+    except ValueError:
+        return render_template('index.html', printed_result="Cannot perform operation with this input")
+```
+:::
+
+### Exercise 4
+
+Now do some **refactoring** of your code (code refactoring means restructuring code without changing its external behaviour, in order to improve readability, scalability, and help prevent bugs):
+
+- Create a new Python module called `helper.py` in your root directory into which you will write functions that you can import into your main app module.
+- In `helper.py`, write a function that performs calculations, taking `value1`, `value2`, and `operation` as arguments and returning the calculated result.
+- Import this function into `flask_app.py` with `from helper import ...` (replacing `...` with your function name).
+- In the `calculate` function in `flask_app.py`, call your helper function to get the result.
+- Extension: write another helper function in `helper.py` that converts the input to `float`, and call it in `flask_app.py` before calling the calculation function. Wrap it in a separate exception handler.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+```{.python filename="helper.py"}
+def perform_calculation(value1: float, value2: float, operation: str) -> float:
+    """Perform a mathematical operation on two values."""
+    if operation == 'add':
+        return value1 + value2
+    elif operation == 'subtract':
+        return value1 - value2
+    elif operation == 'divide':
+        return value1 / value2
+    else:
+        return value1 * value2
+
+def convert_to_float(value1: str, value2: str) -> tuple[float, float]:
+    """Convert two strings to floating point numbers."""
+    return float(value1), float(value2)
+```
+
+```{.python filename="flask_app.py"}
+from flask import Flask, render_template, request
+from helper import perform_calculation, convert_to_float
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    value1 = request.form['value1']
+    value2 = request.form['value2']
+    operation = str(request.form['operation'])
+
+    if operation not in ['add', 'subtract', 'divide', 'multiply']:
+        return render_template('index.html',
+                               printed_result='Invalid operation.')
+    try:
+        value1, value2 = convert_to_float(value1, value2)
+    except ValueError:
+        return render_template('index.html', printed_result="Invalid input")
+
+    try:
+        result = perform_calculation(value1, value2, operation)
+        return render_template('index.html', printed_result=str(result))
+    except ZeroDivisionError:
+        return render_template('index.html', printed_result="Cannot divide by zero")
+```
+:::
+
+### Exercise 5
+
+Try calculating $4.9 - 4.845$ with your calculator. What do you see? Update your code to return the value you would expect.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+The result is `0.055000000000000604` instead of the expected `0.055`. This is a **floating-point precision error** — decimal numbers cannot always be represented exactly as binary fractions.
+
+Use Python's built-in `round()` function to fix this:
+
+```python
+return render_template('index.html', printed_result=str(round(result, 3)))
+```
+
+This rounds the result to 3 decimal places before displaying it.
+
+You can do (fake) arbitrary precision for addition and subtraction by rounding to the number of decimal places of the number with more decimal places.
+:::
+
+### Exercise 6
+
+Add a calculation history page to your app.
+
+- Add a module-level list `history` (`history = []`) in `flask_app.py`. After each successful calculation in `calculate()`, append a string describing the operation and result (e.g. `"3.0 add 4.0 = 7.0"`) to this list.
+- Add a new `/history` route that renders a `history.html` template. The template should display the history as an unordered list using a Jinja2 `{% for %}` loop, and show a message like "No calculations yet." when the list is empty (`{% if %}` / `{% else %}`).
+- Add a link in `index.html` to the history page using `url_for`.
+
+After building this, consider: what happens to the history if you restart the Flask server? Why?
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+```{.python filename="flask_app.py"}
+from flask import Flask, render_template, request
+from helper import perform_calculation, convert_to_float
+
+app = Flask(__name__)
+
+history = []  # in-memory list; cleared on server restart
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    value1 = request.form['value1']
+    value2 = request.form['value2']
+    operation = str(request.form['operation'])
+
+    if operation not in ['add', 'subtract', 'divide', 'multiply']:
+        return render_template('index.html',
+                               printed_result='Invalid operation.')
+    try:
+        value1, value2 = convert_to_float(value1, value2)
+    except ValueError:
+        return render_template('index.html', printed_result="Invalid input")
+
+    try:
+        result = perform_calculation(value1, value2, operation)
+        history.append(f"{value1} {operation} {value2} = {round(result, 3)}")
+        return render_template('index.html', printed_result=str(round(result, 3)))
+    except ZeroDivisionError:
+        return render_template('index.html', printed_result="Cannot divide by zero")
+
+@app.route('/history')
+def show_history():
+    return render_template('history.html', history=history)
+```
+
+```{.html filename="templates/history.html"}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Calculation History</title>
+</head>
+<body>
+    <h1>Calculation History</h1>
+    {% if history %}
+    <ul>
+        {% for entry in history %}
+        <li>{{ entry }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No calculations yet.</p>
+    {% endif %}
+    <a href="{{ url_for('home') }}">Back to calculator</a>
+</body>
+</html>
+```
+
+Add a link to `index.html` (e.g. below the form):
+
+```{.html filename="templates/index.html (addition)"}
+<a href="{{ url_for('show_history') }}">View history</a>
+```
+
+The `history` list lives in Python's memory on the server process. Restarting the server creates a fresh process, so the list is re-initialised to `[]`. In a real application you would persist this data in a permanent store like a database.
+:::
+
+### Exercise 7
+
+The calculator currently treats all input as floating-point numbers. Add support for integer mode, letting the user choose whether to work with integers or floats.
+
+- Add a pair of radio buttons to `index.html` with `name="numtype"` and values `"float"` (checked by default) and `"int"`.
+- In `helper.py`, write a new function `convert_input(value1: str, value2: str, numtype: str)` that converts both values to `int` or `float` depending on `numtype`. What happens if the user selects integer mode but enters `"3.5"`?
+- Update `flask_app.py` to read `numtype` from `request.form` and pass it to `convert_input` instead of `convert_to_float`.
+- In Python 3, `5 / 2` returns `2.5` even when both `5` and `2` are `int`. If the user is in integer mode, is this the result they would expect? Update `perform_calculation` or your Flask logic so that division in integer mode uses `//` (floor division) and returns a whole number.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+```{.python filename="helper.py"}
+def perform_calculation(value1, value2, operation: str, integer_mode: bool = False):
+    """Perform a mathematical operation on two values."""
+    if operation == 'add':
+        return value1 + value2
+    elif operation == 'subtract':
+        return value1 - value2
+    elif operation == 'divide':
+        # Use floor division in integer mode so the result stays an integer
+        return value1 // value2 if integer_mode else value1 / value2
+    else:
+        return value1 * value2
+
+def convert_to_float(value1: str, value2: str) -> tuple[float, float]:
+    """Convert two strings to floating point numbers."""
+    return float(value1), float(value2)
+
+def convert_input(value1: str, value2: str, numtype: str):
+    """Convert two strings to int or float depending on numtype."""
+    if numtype == 'int':
+        # int("3.5") raises ValueError -- caught by the caller
+        return int(value1), int(value2)
+    return float(value1), float(value2)
+```
+
+```{.python filename="flask_app.py (calculate function)"}
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    value1 = request.form['value1']
+    value2 = request.form['value2']
+    operation = str(request.form['operation'])
+    numtype = request.form.get('numtype', 'float')  # default to float
+
+    if operation not in ['add', 'subtract', 'divide', 'multiply']:
+        return render_template('index.html',
+                               printed_result='Invalid operation.')
+    try:
+        value1, value2 = convert_input(value1, value2, numtype)
+    except ValueError:
+        return render_template('index.html',
+                               printed_result="Invalid input — in integer mode, enter whole numbers only.")
+
+    try:
+        integer_mode = (numtype == 'int')
+        result = perform_calculation(value1, value2, operation, integer_mode=integer_mode)
+        history.append(f"{value1} {operation} {value2} = {result}")
+        return render_template('index.html', printed_result=str(result))
+    except ZeroDivisionError:
+        return render_template('index.html', printed_result="Cannot divide by zero")
+```
+
+Add radio buttons to the form in `index.html`:
+
+```{.html filename="templates/index.html (addition inside the form)"}
+<label><input type="radio" name="numtype" value="float" checked> Float</label>
+<label><input type="radio" name="numtype" value="int"> Integer</label>
+```
+:::
+
+### Exercise 8
+
+Implement a **Reverse Polish Notation (RPN)** calculator as a new page in your app.
+
+In a standard (i.e. **infix**) expression like `3 + 4`, the **operator** `+` sits between its **operands** `3` and `4`. In **Reverse Polish Notation**, operators follow their operands: `3 4 +`. An RPN expression can be evaluated with a single left-to-right pass using a **stack**:
+
+1. For each token in the expression (split on spaces):
+    - If it is a number, **push** it onto the stack.
+    - If it is an operator (`+`, `-`, `*`, `/`), **pop** the top two values, apply the operator, and **push** the result.
+2. The single value remaining on the stack is the answer.
+
+Example: `5 1 2 + 4 * + 3 -`:
+
+| Token | Action | Stack |
+|-------|--------|-------|
+| `5` | push | `[5]` |
+| `1` | push | `[5, 1]` |
+| `2` | push | `[5, 1, 2]` |
+| `+` | pop 2 and 1, push 3 | `[5, 3]` |
+| `4` | push | `[5, 3, 4]` |
+| `*` | pop 4 and 3, push 12 | `[5, 12]` |
+| `+` | pop 12 and 5, push 17 | `[17]` |
+| `3` | push | `[17, 3]` |
+| `-` | pop 3 and 17, push 14 | `[14]` |
+
+Result: `14`.
+
+The term **pop** might have made you think of Python's `pop`. This is a good reminder that you can use a Python list as a stack. `list.append(x)` pushes and `list.pop()` pops the top element.
+
+- Write an `evaluate_rpn(expression: str) -> float` function in a new module called `rpn.py`. **Raise** a descriptive `ValueError` for malformed input (e.g. not enough operands, unknown tokens, values left over on the stack after processing all tokens).
+- Add a `/rpn` route to `flask_app.py` that accepts both **GET** (show the form) and **POST** (evaluate and show the result). A single route can handle both by checking `request.method`. On a successful evaluation (i.e. correct input), append the expression and result to `history`.
+- Create a `templates/rpn.html` template with a text input for the expression and a display for the result or error message.
+- Add a link to `/rpn` from `index.html`.
+
+Go through the example above by hand before writing code to make sure you understand the algorithm and are implementing the correct thing.
+
+::: {.callout-tip collapse="true"}
+## Solution
+
+```{.python filename="rpn.py"}
+def evaluate_rpn(expression: str) -> float:
+    """Evaluate a Reverse Polish Notation expression using a stack."""
+    stack = []
+    operators = {'+', '-', '*', '/'}
+
+    for token in expression.split():
+        if token in operators:
+            if len(stack) < 2:
+                raise ValueError(f"Not enough operands for operator '{token}'")
+            b = stack.pop()
+            a = stack.pop()
+            if token == '+':
+                stack.append(a + b)
+            elif token == '-':
+                stack.append(a - b)
+            elif token == '*':
+                stack.append(a * b)
+            elif token == '/':
+                if b == 0:
+                    raise ValueError("Division by zero")
+                stack.append(a / b)
+        else:
+            try:
+                stack.append(float(token))
+            except ValueError:
+                raise ValueError(f"'{token}' is not a valid number or operator")
+
+    if len(stack) != 1:
+        raise ValueError(f"Invalid expression: {len(stack)} value(s) left on the stack")
+    return stack[0]
+```
+
+```{.python filename="flask_app.py (addition)"}
+from helper import perform_calculation, convert_to_float, convert_input
+from rpn import evaluate_rpn
+
+@app.route('/rpn', methods=['GET', 'POST'])
+def rpn():
+    result = None
+    error = None
+    if request.method == 'POST':
+        expression = request.form['expression']
+        try:
+            result = evaluate_rpn(expression)
+            history.append(f"RPN: {expression} = {result}")
+        except ValueError as e:
+            error = str(e)
+    return render_template('rpn.html', result=result, error=error)
+```
+
+```{.html filename="templates/rpn.html"}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RPN Calculator</title>
+</head>
+<body>
+    <h1>RPN Calculator</h1>
+    <p>Enter a space-separated Reverse Polish Notation expression, e.g. <code>5 1 2 + 4 * + 3 -</code></p>
+    <form action="{{ url_for('rpn') }}" method="post">
+        <input type="text" name="expression" placeholder="e.g. 3 4 +" style="width: 300px;" />
+        <button type="submit">Evaluate</button>
+    </form>
+    <br>
+    {% if result is not none %}
+    <p>Result: {{ result }}</p>
+    {% endif %}
+    {% if error %}
+    <p>Error: {{ error }}</p>
+    {% endif %}
+    <a href="{{ url_for('home') }}">Back to calculator</a>
+</body>
+</html>
+```
+
+Add a link in `index.html`:
+
+```{.html filename="templates/index.html (addition)"}
+<a href="{{ url_for('rpn') }}">RPN calculator</a>
+```
+:::
