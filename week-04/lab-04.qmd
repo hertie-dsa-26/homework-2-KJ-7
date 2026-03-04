@@ -219,7 +219,9 @@ def home(value1, value2):
     return str(value1 + value2)  # float is not a valid response type; convert to string
 ```
 
-Angle brackets in a route pattern (e.g. `<value1>`) are **URL variables**: Flask extracts whatever string appears at that position in the URL and passes it as an argument to the **view function**. The variable name in the route must match the parameter name in the **function signature**.
+Angle brackets in a route pattern (e.g. `<value1>`) delineate **URL variables**. Flask extracts whatever string appears at that position in the URL and passes it as an argument to the view function. With our current `home` view function, visiting `http://127.0.0.1:5000/3.0_4.5` would call `home(value1='3.0', value2='4.5')`, and visiting `http://127.0.0.1:5000/10_20` would call `home(value1='10', value2='20')`. All URL variables are captured as strings by default; you can add a type converter like `<float:value1>` to have Flask **validate** and **conver**t the value before passing it to the function. If you want a recap, see lab 03.
+
+The variable names in the route (`<value1>`, `<value2>`) must match the parameter names in the **function signature**. A function's signature is the function's name combined with its parameter list. For example, the signature of `def home(value1, value2):` is `home(value1, value2)`. Flask uses the signature to know which URL segment maps to which argument when calling the function.
 
 Next, let the user choose the operation (for now, allowing only addition):
 
@@ -234,13 +236,17 @@ def home(value1, value2, operation):
         return 'Operation must be "addition"'
 ```
 
+Note: We could have done `/<float:value1>_<operation>_<float:value2>` to have Flask validate and convert `value1` and `value2` for us.
+
 ## Accepting form input
 
-When building dynamic web applications, we need to allow users to interact with the app — providing input to trigger calculations or actions. The goal here is to let users enter values (numbers and an operation) into an HTML **form**, press a button, and see the result of a calculation.
+When building dynamic web applications, we need to allow users to interact with the app, providing input to trigger calculations or actions. The goal here is to let users enter values (numbers and an operation) into an HTML **form**, press a button, and see the result of a calculation.
 
-To achieve this, we use form elements in our frontend HTML templates, which allow users to submit their input to the server. The server carries out the calculations as defined in the backend Flask logic.
+To achieve this, we'll use **form elements** in our frontend **HTML templates**, which allow users to submit their input to the server. The server carries out the calculations defined in the backend Flask logic.
 
 ### HTML form
+
+An HTML **form** is a section of a page that collects input from the user and sends it to a server when the user clicks a submit button. A form groups together one or more input fields (e.g. text boxes, drop-downs, checkboxes, etc), where each input field is identified by a `name` attribute. When the user submits the form, the browser packages all the named input values together and sends them to the URL specified in the form's `action` attribute, using the HTTP method specified in `method`.
 
 Create a `templates` folder inside your project root, then create an `index.html` file within it:
 
@@ -269,10 +275,9 @@ Create a `templates` folder inside your project root, then create an `index.html
 </html>
 ```
 
-This form has several key attributes:
+The `action` attribute specifies the URL that the form data is sent to when the user clicks submit. `url_for('calculate')` is a Flask function that generates a URL from a view function's name--in this case, resolving the `calculate` view function to the `/calculate` route. Using `url_for` rather than hard-coding `/calculate` means the URL stays correct even if you restructure your routes.
 
-- The `action` attribute specifies the URL that the form data is sent to when the user clicks submit. `url_for('calculate')` is a Flask function that generates a URL from a view function's name — here, it resolves to `/calculate`. Using `url_for` rather than hard-coding `/calculate` means the URL stays correct even if you restructure your routes.
-- The `method` attribute determines how the data is sent to the server. **POST** sends the data in the request body, keeping it out of the URL — the conventional choice for form submissions. **GET**, by contrast, appends data to the URL as query parameters (e.g. `/search?q=flask`), which is more appropriate for read-only lookups. We will need to specify `methods=['POST']` in the corresponding Flask route.
+The `method` attribute specifies which **HTTP method** to use. HTTP methods convey the *intent* of a request: **GET** means "retrieve this resource", **POST** means "submit data to be processed". When a form uses **POST**, the browser packages the form fields into the request body, keeping them out of the URL and out of the browser's address bar and history. This is the conventional choice when the submission causes something to happen on the server (e.g. a calculation, creating an account, posting a comment). **GET** appends the form data to the URL as query parameters (e.g. `/search?q=flask&page=2`), which makes the request bookmarkable and shareable, which is appropriate and often desirable for read-only operations like searches. By default, Flask routes only accept GET requests, so we need to add `methods=['POST']` to the route decorator to allow POST.
 - The `name` tags on each input determine how the data is labelled when it reaches the server. For example, `name="value1"` means Flask will access this field using `request.form['value1']` when the form is submitted.
 
 ### Flask logic
@@ -302,9 +307,9 @@ def calculate():
         return render_template('index.html', printed_result='Operation must be "addition"')
 ```
 
-`request` is a Flask object that contains everything about the incoming HTTP request. `request.form` is a dictionary-like object populated with the form fields from a POST submission, accessible by each input's `name` attribute.
+`request` is a Flask object that contains everything about the incoming HTTP request. `request.form` is a dictionary-like object populated with the form fields from a POST submission, accessible by each input's `name` attribute (e.g. `value1` and `value2` in our case).
 
-`render_template('index.html', printed_result=...)` finds `templates/index.html`, fills in the `{{ printed_result }}` Jinja2 placeholder with the value you pass, and returns the resulting HTML. Any keyword argument you pass to `render_template` becomes a variable available inside the template.
+`render_template('index.html', printed_result=...)` finds `templates/index.html`, fills in the `{{ printed_result }}` Jinja2 placeholder with the value you pass, and returns the resulting HTML. Any keyword argument you pass to `render_template` becomes a variable available inside the Jinja2 template.
 
 # How to deploy your Flask app? {#deployment}
 
@@ -314,29 +319,29 @@ So far, your app has been running on your own machine: Flask's development serve
 
 There are a few important differences between running locally and deploying:
 
-- **The server runs continuously.** A remote server does not shut down when you close your laptop — it keeps running and accepting requests.
-- **Flask's development server is not suitable for production.** Werkzeug's built-in server is single-threaded and not hardened for security or load. In a real deployment, a dedicated WSGI server (such as Gunicorn or uWSGI) sits in front of your Flask app and handles the actual HTTP traffic.
-- **Your code needs to be on the remote machine.** The server cannot run code that only exists on your laptop; you have to upload your files to the hosting platform.
+- The server runs continuously: A remote server does not shut down when you close your laptop — it keeps running and accepting requests.
+- Flask's development server is not suitable for production: Werkzeug's built-in server is single-threaded and not hardened for security or designed for operating under load. In a real deployment, a dedicated WSGI server (such as Gunicorn or uWSGI) sits in front of your Flask app and handles the actual HTTP traffic.
+- Your code needs to be on the remote machine: The server cannot run code that only exists on your laptop; you have to upload your files to the hosting platform.
 
-We will use [PythonAnywhere](https://www.pythonanywhere.com/), a hosting platform designed for Python web apps, which has a completely free tier. PythonAnywhere provides a Linux server, a public domain (`yourusername.pythonanywhere.com`), and configures a WSGI server in front of your Flask app automatically — you only need to upload your code.
+One option for deploying a toy app is [PythonAnywhere](https://www.pythonanywhere.com/), a hosting platform designed for Python web apps, which has a completely free tier. PythonAnywhere provides a Linux server, a public domain (`yourusername.pythonanywhere.com`), and configures a WSGI server in front of your Flask app automatically, so you only need to upload your code.
 
 ## Create your web app on PythonAnywhere
 
-* Create a free PythonAnywhere account and log in.
-* Go to the Web menu item and press Add new web app.
-* Click Next, then click on the Flask option and finally choose the latest version of Python in the list.
-* You will now see the PythonAnywhere project path — accept the default by clicking Next.
-* In your browser, visit `https://yourusername.pythonanywhere.com` (replacing `yourusername` with your actual PythonAnywhere username).
+- Create a free PythonAnywhere account and log in.
+- Go to the Web menu item and press Add new web app.
+- Click Next, then click on the Flask option and finally choose the latest version of Python in the list.
+- You will now see the PythonAnywhere project path — accept the default by clicking Next.
+- In your browser, visit `https://yourusername.pythonanywhere.com` (replacing `yourusername` with your actual PythonAnywhere username).
 
 ## Upload your project
 
-* Go to the Web menu and scroll down to the Code section. Click Go to directory next to where it says Source code.
-* This takes you to the Files section of PythonAnywhere. Delete the `flask_app.py` file that is there by default.
-* Use the Upload a file button to upload your own `flask_app.py` file. The file must be named exactly `flask_app.py`: PythonAnywhere's WSGI configuration references this filename by convention.
-* On the left, under Directories, enter the name `templates` into the box and press New directory.
-* Upload the `index.html` file into this directory.
-* Go back to the Web menu and click Reload `https://yourusername.pythonanywhere.com`.
-* Send the link to your friends and relatives to make them proud of how far you've come.
+- Go to the Web menu and scroll down to the Code section. Click Go to directory next to where it says Source code.
+- This takes you to the Files section of PythonAnywhere. Delete the `flask_app.py` file that is there by default.
+- Use the Upload a file button to upload your own `flask_app.py` file. The file must be named exactly `flask_app.py`: PythonAnywhere's WSGI configuration references this filename by convention.
+- On the left, under Directories, enter the name `templates` into the box and press New directory.
+- Upload the `index.html` file into this directory.
+- Go back to the Web menu and click Reload `https://yourusername.pythonanywhere.com`.
+- Send the link to your friends and relatives to make them proud of how far you've come.
 
 # Exercises {#exercises}
 
