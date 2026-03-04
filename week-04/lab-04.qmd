@@ -6,13 +6,13 @@ title: Lab 4
 
 ## Today
 
-* [Coding workflows](#workflows)
-* [Dynamic web apps with Flask](#dynamic)
-* [A Dynamic Flask example: a calculator](#example)
-* [Deploying your Flask app](#deployment)
-* [Type Hints](#type-hints)
-* [Exception Handling](#exceptions)
-* [Exercises](#exercises)
+- [Coding workflows](#workflows)
+    - [Type Hints](#type-hints)
+    - [Exception Handling](#exceptions)
+- [Dynamic web apps with Flask](#dynamic)
+- [A Dynamic Flask example: a calculator](#example)
+- [Deploying your Flask app](#deployment)
+- [Exercises](#exercises)
 
 ## Learning Objectives
 
@@ -43,7 +43,7 @@ To change the CWD, use the change directory command `cd`:
 
 Paths beginning with `/` are absolute. Otherwise they are relative.
 
-Before running any project command (`uv run`, `flask`, `python`, etc), make sure that you are in the right directory. Similarily, if terminal commands aren't working for you, double check the current working directory.
+Before running any project command (`uv run`, `flask`, `python`, etc), make sure that you are in the right directory. Similarly, if terminal commands aren't working for you, double check the current working directory.
 
 You can print the contents of the current working directory (CWD) with the `ls` (macOS/Linux) or `dir` (Windows) commands.
 
@@ -80,7 +80,7 @@ my_project/
   - helper.py
 ```
 
-The `import` statement runs the imported file, makes its imported names available in the current namespace, and caches the result. Using the example above, `perform_calculation` is the name added to the current makespace.
+The `import` statement runs the imported file, makes its imported names available in the current namespace, and caches the result. Using the example above, `perform_calculation` is the name added to the current namespace.
 
 A few conventions to be aware of:
 
@@ -330,7 +330,7 @@ def home(value1, value2):
     return str(value1 + value2)  # float is not a valid response type; convert to string
 ```
 
-Angle brackets in a route pattern (e.g. `<value1>`) delineate **URL variables**. Flask extracts whatever string appears at that position in the URL and passes it as an argument to the view function. With our current `home` view function, visiting `http://127.0.0.1:5000/3.0_4.5` would call `home(value1='3.0', value2='4.5')`, and visiting `http://127.0.0.1:5000/10_20` would call `home(value1='10', value2='20')`. All URL variables are captured as strings by default; you can add a type converter like `<float:value1>` to have Flask **validate** and **conver**t the value before passing it to the function. If you want a recap, see lab 03.
+Angle brackets in a route pattern (e.g. `<value1>`) delineate **URL variables**. Flask extracts whatever string appears at that position in the URL and passes it as an argument to the view function. With our current `home` view function, visiting `http://127.0.0.1:5000/3.0_4.5` would call `home(value1='3.0', value2='4.5')`, and visiting `http://127.0.0.1:5000/10_20` would call `home(value1='10', value2='20')`. All URL variables are captured as strings by default; you can add a type converter like `<float:value1>` to have Flask **validate** and **convert** the value before passing it to the function. If you want a recap, see lab 03.
 
 The variable names in the route (`<value1>`, `<value2>`) must match the parameter names in the **function signature**. A function's signature is the function's name combined with its parameter list. For example, the signature of `def home(value1, value2):` is `home(value1, value2)`. Flask uses the signature to know which URL segment maps to which argument when calling the function.
 
@@ -338,7 +338,7 @@ Next, let the user choose the operation (for now, allowing only addition):
 
 ```{.python filename="flask_app.py"}
 @app.route('/<value1>_<operation>_<value2>')
-def home(value1, value2, operation):
+def home(value1, operation, value2):
     value1 = float(value1)
     value2 = float(value2)
     if operation == 'addition':
@@ -371,7 +371,7 @@ Create a `templates` folder inside your project root, then create an `index.html
 <body>
     <h1>Calculator</h1>
 
-    <form action="{{ url_for('calculate')}}" method="post">
+    <form action="{{ url_for('calculate') }}" method="post">
         <input type="text" name="value1" placeholder="Enter the first number" required="required" />
         <input type="text" name="value2" placeholder="Enter the second number" required="required" />
         <input type="text" name="operation" placeholder="addition" required="required" />
@@ -654,7 +654,7 @@ return render_template('index.html', printed_result=str(round(result, 3)))
 
 This rounds the result to 3 decimal places before displaying it.
 
-You can do (fake) arbitrary precision for addition and subtraction by rounding to the number of decimal plces of the number with more decimal places.
+You can do (fake) arbitrary precision for addition and subtraction by rounding to the number of decimal places of the number with more decimal places.
 :::
 
 ### Exercise 6
@@ -746,7 +746,7 @@ The calculator currently treats all input as floating-point numbers. Add support
 - Add a pair of radio buttons to `index.html` with `name="numtype"` and values `"float"` (checked by default) and `"int"`.
 - In `helper.py`, write a new function `convert_input(value1: str, value2: str, numtype: str)` that converts both values to `int` or `float` depending on `numtype`. What happens if the user selects integer mode but enters `"3.5"`?
 - Update `flask_app.py` to read `numtype` from `request.form` and pass it to `convert_input` instead of `convert_to_float`.
-- In Python 3, `5 / 2` returns `2.5` even when both `5` and `3` are `int`. If the user is in integer mode, is this the result they would expect? Update `perform_calculation` or your Flask logic so that division in integer mode uses `//` (floor division) and returns a whole number.
+- In Python 3, `5 / 2` returns `2.5` even when both `5` and `2` are `int`. If the user is in integer mode, is this the result they would expect? Update `perform_calculation` or your Flask logic so that division in integer mode uses `//` (floor division) and returns a whole number.
 
 ::: {.callout-tip collapse="true"}
 ## Solution

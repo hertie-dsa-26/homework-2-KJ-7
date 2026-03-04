@@ -2376,12 +2376,14 @@ window.Quarto = {
 <section id="today" class="level2">
 <h2 class="anchored" data-anchor-id="today">Today</h2>
 <ul>
-<li><a href="#workflows">Coding workflows</a></li>
+<li><a href="#workflows">Coding workflows</a>
+<ul>
+<li><a href="#type-hints">Type Hints</a></li>
+<li><a href="#exceptions">Exception Handling</a></li>
+</ul></li>
 <li><a href="#dynamic">Dynamic web apps with Flask</a></li>
 <li><a href="#example">A Dynamic Flask example: a calculator</a></li>
 <li><a href="#deployment">Deploying your Flask app</a></li>
-<li><a href="#type-hints">Type Hints</a></li>
-<li><a href="#exceptions">Exception Handling</a></li>
 <li><a href="#exercises">Exercises</a></li>
 </ul>
 </section>
@@ -2412,7 +2414,7 @@ window.Quarto = {
 <li><code>cd /Users/yourname/Documents/my_project</code> — move to an absolute path, regardless of where you currently are.</li>
 </ul>
 <p>Paths beginning with <code>/</code> are absolute. Otherwise they are relative.</p>
-<p>Before running any project command (<code>uv run</code>, <code>flask</code>, <code>python</code>, etc), make sure that you are in the right directory. Similarily, if terminal commands aren’t working for you, double check the current working directory.</p>
+<p>Before running any project command (<code>uv run</code>, <code>flask</code>, <code>python</code>, etc), make sure that you are in the right directory. Similarly, if terminal commands aren’t working for you, double check the current working directory.</p>
 <p>You can print the contents of the current working directory (CWD) with the <code>ls</code> (macOS/Linux) or <code>dir</code> (Windows) commands.</p>
 </section>
 <section id="virtual-environments-and-uv" class="level2">
@@ -2440,7 +2442,7 @@ window.Quarto = {
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">my_project/</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">-</span> flask_app.py</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">-</span> helper.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The <code>import</code> statement runs the imported file, makes its imported names available in the current namespace, and caches the result. Using the example above, <code>perform_calculation</code> is the name added to the current makespace.</p>
+<p>The <code>import</code> statement runs the imported file, makes its imported names available in the current namespace, and caches the result. Using the example above, <code>perform_calculation</code> is the name added to the current namespace.</p>
 <p>A few conventions to be aware of:</p>
 <ul>
 <li><strong>Module names</strong> are the filename without the <code>.py</code> extension. <code>helper.py</code> is imported as <code>helper</code>.</li>
@@ -2688,7 +2690,7 @@ window.Quarto = {
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> <span class="bu">float</span>(value2)</span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">str</span>(value1 <span class="op">+</span> value2)  <span class="co"># float is not a valid response type; convert to string</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Angle brackets in a route pattern (e.g. <code>&lt;value1&gt;</code>) delineate <strong>URL variables</strong>. Flask extracts whatever string appears at that position in the URL and passes it as an argument to the view function. With our current <code>home</code> view function, visiting <code>http://127.0.0.1:5000/3.0_4.5</code> would call <code>home(value1=&#39;3.0&#39;, value2=&#39;4.5&#39;)</code>, and visiting <code>http://127.0.0.1:5000/10_20</code> would call <code>home(value1=&#39;10&#39;, value2=&#39;20&#39;)</code>. All URL variables are captured as strings by default; you can add a type converter like <code>&lt;float:value1&gt;</code> to have Flask <strong>validate</strong> and <strong>conver</strong>t the value before passing it to the function. If you want a recap, see lab 03.</p>
+<p>Angle brackets in a route pattern (e.g. <code>&lt;value1&gt;</code>) delineate <strong>URL variables</strong>. Flask extracts whatever string appears at that position in the URL and passes it as an argument to the view function. With our current <code>home</code> view function, visiting <code>http://127.0.0.1:5000/3.0_4.5</code> would call <code>home(value1=&#39;3.0&#39;, value2=&#39;4.5&#39;)</code>, and visiting <code>http://127.0.0.1:5000/10_20</code> would call <code>home(value1=&#39;10&#39;, value2=&#39;20&#39;)</code>. All URL variables are captured as strings by default; you can add a type converter like <code>&lt;float:value1&gt;</code> to have Flask <strong>validate</strong> and <strong>convert</strong> the value before passing it to the function. If you want a recap, see lab 03.</p>
 <p>The variable names in the route (<code>&lt;value1&gt;</code>, <code>&lt;value2&gt;</code>) must match the parameter names in the <strong>function signature</strong>. A function’s signature is the function’s name combined with its parameter list. For example, the signature of <code>def home(value1, value2):</code> is <code>home(value1, value2)</code>. Flask uses the signature to know which URL segment maps to which argument when calling the function.</p>
 <p>Next, let the user choose the operation (for now, allowing only addition):</p>
 <div class="code-with-filename">
@@ -2696,7 +2698,7 @@ window.Quarto = {
 <pre><strong>flask_app.py</strong></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14" data-filename="flask_app.py"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&lt;value1&gt;_&lt;operation&gt;_&lt;value2&gt;&#39;</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home(value1, value2, operation):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> home(value1, operation, value2):</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    value1 <span class="op">=</span> <span class="bu">float</span>(value1)</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    value2 <span class="op">=</span> <span class="bu">float</span>(value2)</span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> operation <span class="op">==</span> <span class="st">&#39;addition&#39;</span>:</span>
@@ -2728,7 +2730,7 @@ window.Quarto = {
 <span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
 <span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Calculator<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
 <span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> action</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;calculate&#39;)}}&quot;</span><span class="ot"> method</span><span class="op">=</span><span class="st">&quot;post&quot;</span><span class="dt">&gt;</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> action</span><span class="op">=</span><span class="st">&quot;{{ url_for(&#39;calculate&#39;) }}&quot;</span><span class="ot"> method</span><span class="op">=</span><span class="st">&quot;post&quot;</span><span class="dt">&gt;</span></span>
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;value1&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;Enter the first number&quot;</span><span class="ot"> required</span><span class="op">=</span><span class="st">&quot;required&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
 <span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;value2&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;Enter the second number&quot;</span><span class="ot"> required</span><span class="op">=</span><span class="st">&quot;required&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
 <span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">&quot;text&quot;</span><span class="ot"> name</span><span class="op">=</span><span class="st">&quot;operation&quot;</span><span class="ot"> placeholder</span><span class="op">=</span><span class="st">&quot;addition&quot;</span><span class="ot"> required</span><span class="op">=</span><span class="st">&quot;required&quot;</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
@@ -3065,7 +3067,7 @@ window.Quarto = {
 <p>Use Python’s built-in <code>round()</code> function to fix this:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> render_template(<span class="st">&#39;index.html&#39;</span>, printed_result<span class="op">=</span><span class="bu">str</span>(<span class="bu">round</span>(result, <span class="dv">3</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This rounds the result to 3 decimal places before displaying it.</p>
-<p>You can do (fake) arbitrary precision for addition and subtraction by rounding to the number of decimal plces of the number with more decimal places.</p>
+<p>You can do (fake) arbitrary precision for addition and subtraction by rounding to the number of decimal places of the number with more decimal places.</p>
 </div>
 </div>
 </div>
@@ -3174,7 +3176,7 @@ window.Quarto = {
 <li>Add a pair of radio buttons to <code>index.html</code> with <code>name=&quot;numtype&quot;</code> and values <code>&quot;float&quot;</code> (checked by default) and <code>&quot;int&quot;</code>.</li>
 <li>In <code>helper.py</code>, write a new function <code>convert_input(value1: str, value2: str, numtype: str)</code> that converts both values to <code>int</code> or <code>float</code> depending on <code>numtype</code>. What happens if the user selects integer mode but enters <code>&quot;3.5&quot;</code>?</li>
 <li>Update <code>flask_app.py</code> to read <code>numtype</code> from <code>request.form</code> and pass it to <code>convert_input</code> instead of <code>convert_to_float</code>.</li>
-<li>In Python 3, <code>5 / 2</code> returns <code>2.5</code> even when both <code>5</code> and <code>3</code> are <code>int</code>. If the user is in integer mode, is this the result they would expect? Update <code>perform_calculation</code> or your Flask logic so that division in integer mode uses <code>//</code> (floor division) and returns a whole number.</li>
+<li>In Python 3, <code>5 / 2</code> returns <code>2.5</code> even when both <code>5</code> and <code>2</code> are <code>int</code>. If the user is in integer mode, is this the result they would expect? Update <code>perform_calculation</code> or your Flask logic so that division in integer mode uses <code>//</code> (floor division) and returns a whole number.</li>
 </ul>
 <div class="callout callout-style-default callout-tip no-icon callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
