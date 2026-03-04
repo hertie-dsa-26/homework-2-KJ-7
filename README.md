@@ -13,3 +13,8 @@
 ## Week 3: Intro to Flask
 
 - [Tutorial / Presentation](week-03/lab-03.html)
+
+## Week 4: Flask (2)
+
+- [Tutorial / Presentation](week-04/lab-04.html)
+- [Calculator App with Exercise Solutions](week-04/calculator_app/)
