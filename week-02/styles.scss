@@ -1,0 +1,106 @@
+/*-- scss:defaults --*/
+
+$body-bg:       #FAF0E6; /* Linen */
+$code-color:    #920000ff;
+$code-bg:       #F0E0D6;
+$code-block-bg: #272822;
+$output-color:  #FFFFFF;
+
+
+/*-- scss:rules --*/
+
+strong, b {
+  color: #e10000ff;
+}
+
+/* Cell output -------------------------------------------------------------- */
+
+.cell-output pre {
+  background-color: $code-block-bg;
+  color: $output-color;
+
+  code {
+    background-color: $code-block-bg;
+    color: $output-color;
+  }
+}
+
+/* Executable cells --------------------------------------------------------- */
+
+.cell[data-execution_count] {
+  background-color: $code-block-bg;
+  padding: 0.25em 1em;
+  border-radius: 0.375em;
+  margin-bottom: 2em;
+
+  /* Nesting adds [data-execution_count] to specificity, replacing !important */
+
+  .cell-code {
+    &.sourceCode {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    pre.sourceCode {
+      padding-top: 0.25em;
+      padding-bottom: 0.25em;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  div.sourceCode {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+/* REPL blocks (pre.pycon) -------------------------------------------------- */
+
+div.sourceCode:has(pre.pycon) {
+  margin-bottom: 1em;
+}
+
+/* Bash blocks -------------------------------------------------------------- */
+
+pre.bash {
+  background-color: $code-block-bg;
+  color: $output-color;
+  padding: 0.75em 1em;
+  border-radius: 0.375em;
+
+  code {
+    background-color: $code-block-bg;
+    color: $output-color;
+  }
+}
+
+/* Code annotations --------------------------------------------------------- */
+
+pre.sourceCode code a.code-annotation-anchor {
+  color: $output-color;
+  background-color: transparent;
+  border-color: $output-color;
+}
+
+.code-annotation-gutter-bg {
+  background-color: $code-block-bg;
+}
+
+.code-annotation-gutter {
+  color: $output-color;
+}
+
+dl.code-annotation-container-grid {
+  color: $output-color;
+
+  dt {
+    color: $output-color;
+    background-color: transparent;
+    border-color: $output-color;
+  }
+
+  dd {
+    color: $output-color;
+  }
+}
